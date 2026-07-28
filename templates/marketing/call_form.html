@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Centered container to ensure it stays away from sidebar edges -->
+<div style="max-width: 700px; margin: 0 auto; width: 100%;">
+    <div class="page-header" style="margin-bottom: 24px;">
+        <h1 class="page-title">ثبت رکورد جدید</h1>
+    </div>
+
+    <div class="card">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label" style="display: flex; justify-content: space-between;">
+                    <span>نام شرکت / مشتری *</span>
+                    <a href="javascript:void(0)" onclick="openCustomerModal()" style="font-size: 11px; color: var(--primary); text-decoration: none;">+ مشتری جدید</a>
+                </label>
+                <!-- id_customer specifically targeted in CSS -->
+                <select name="customer" class="form-select" required id="id_customer">
+                    {% for val, label in form.fields.customer.choices %}
+                        {% if val == "" %}
+                            <option value="" disabled selected>-- انتخاب مشتری --</option>
+                        {% else %}
+                            <option value="{{ val }}" {% if form.customer.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Manually render other fields to ensure exact layout -->
+            <div class="form-group">
+                <label class="form-label">حوزه فعالیت</label>
+                <input type="text" name="field_of_activity" class="form-input" value="{{ form.field_of_activity.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">نام نفر رابط *</label>
+                <input type="text" name="contact_person" class="form-input" required value="{{ form.contact_person.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">تلفن همراه *</label>
+                <input type="text" name="mobile" class="form-input" required value="{{ form.mobile.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">نتیجه تماس</label>
+                <input type="text" name="result" class="form-input" value="{{ form.result.value|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">تاریخ پیگیری</label>
+                <input type="date" name="follow_up_date" class="form-input" value="{{ form.follow_up_date.value|date:'Y-m-d' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">یادداشت‌ها</label>
+                <textarea name="notes" class="form-input" rows="4">{{ form.notes.value|default:'' }}</textarea>
+            </div>
+
+            <div class="form-actions" style="margin-top: 24px; display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">ثبت نهایی</button>
+                <a href="{% url 'marketing:call_list' %}" class="btn" style="background: hsl(var(--secondary));">انصراف</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

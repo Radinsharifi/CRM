@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<button class="btn" onclick="history.back()" style="background:none; color:hsl(var(--muted-foreground)); margin-bottom:16px;">
+    ← بازگشت به لیست
+</button>
+
+<div class="detail-header" style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
+    <div class="detail-avatar" style="width:64px; height:64px; border-radius:16px; background:linear-gradient(135deg, hsl(var(--primary)), hsl(221 83% 63%)); display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700;">
+        {{ object.company_name|slice:":1" }}
+    </div>
+    <div>
+        <div style="font-size:22px; font-weight:700;">{{ object.company_name }}</div>
+        <div style="font-size:13px; color:hsl(var(--muted-foreground));">رابط اصلی: {{ object.name }}</div>
+    </div>
+</div>
+
+<div class="grid grid-2" style="margin-bottom:24px;">
+    <div class="card">
+        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات تماس</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">تلفن همراه</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.phone_number }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">ایمیل</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.email|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">تاریخ ثبت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.created_at|date:"Y/m/d" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">خلاصه فعالیت‌ها</h3>
+        <div style="font-size:24px; font-weight:700; color:hsl(var(--primary));">{{ call_history.count }}</div>
+        <div style="font-size:12px; color:hsl(var(--muted-foreground));">تعداد کل تماس‌های ثبت شده با این شرکت</div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">تاریخچه تعاملات (تایم‌لاین)</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>تاریخ تماس</th>
+                    <th>شخص رابط در تماس</th>
+                    <th>نتیجه</th>
+                    <th>پیگیری بعدی</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for call in call_history %}
+                <tr class="clickable-row" data-href="{% url 'marketing:call_detail' call.id %}">
+                    <td>{{ call.created_at|date:"Y/m/d H:i" }}</td>
+                    <td>{{ call.contact_person }}</td>
+                    <td><span class="badge">{{ call.result }}</span></td>
+                    <td>{{ call.follow_up_date|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center;">هیچ تعاملی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

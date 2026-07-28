@@ -1,0 +1,119 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM هوشمند آنی بار</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+                    </svg>
+                </div>
+                <span class="logo-text">CRM هوشمند آنی بار</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{% url 'marketing:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                    <span>داشبورد</span>
+                </a>
+                <a href="{% url 'marketing:customer_list' %}" class="nav-item {% if 'customer' in request.path %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
+                    <span>مشتریان</span>
+                </a>
+                <a href="{% url 'marketing:call_list' %}" class="nav-item {% if 'call' in request.path %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z" /><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" /></svg>
+                    <span>بازاریابان</span>
+                </a>
+            </nav>
+            <!-- ORIGINAL TOGGLE CODE RESTORED -->
+            <div class="sidebar-toggle">
+                <button onclick="toggleSidebar()">
+                    <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
+                    <span>جمع کردن</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <header class="top-header">
+                <div class="header-datetime">
+                    <div class="time" id="header-time"></div>
+                    <div class="date" id="header-date"></div>
+                </div>
+            </header>
+            <div class="page-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Customer Modal -->
+    <div id="customerModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">افزودن سریع مشتری</h3>
+            <form id="quickCustomerForm" method="POST" action="{% url 'marketing:customer_create_js' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">نام شرکت</label>
+                    <input type="text" name="company_name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">نام رابط</label>
+                    <input type="text" name="name" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">شماره تماس</label>
+                    <input type="text" name="phone_number" class="form-input" required>
+                </div>
+                <div class="form-actions" style="justify-content: flex-end;">
+                    <button type="button" class="btn" onclick="closeCustomerModal()">انصراف</button>
+                    <button type="submit" class="btn btn-primary">ذخیره مشتری</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('collapsed');
+            const icon = document.getElementById('collapse-icon');
+            // Rotate the arrow SVG
+            icon.style.transform = sb.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        document.addEventListener('click', function (e) {
+            const row = e.target.closest('.clickable-row');
+            if (row && !e.target.closest('a') && !e.target.closest('button')) {
+                window.location.href = row.dataset.href;
+            }
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('header-time').textContent = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('header-date').textContent = now.toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+        updateDateTime(); setInterval(updateDateTime, 60000);
+
+        function openCustomerModal() { document.getElementById('customerModal').classList.add('active'); }
+        function closeCustomerModal() { document.getElementById('customerModal').classList.remove('active'); }
+        
+        // Close modal if clicking outside
+        window.onclick = function(event) {
+            let modal = document.getElementById('customerModal');
+            if (event.target == modal) closeCustomerModal();
+        }
+    </script>
+</body>
+</html>

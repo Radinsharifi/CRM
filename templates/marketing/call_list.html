@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+    <div>
+        <h1 class="page-title">تاریخچه تماس‌ها</h1>
+        <p class="page-desc">گزارشات ثبت شده توسط تیم بازاریابی</p>
+    </div>
+    <a href="{% url 'marketing:call_create' %}" class="btn btn-primary">+ ثبت رکورد جدید</a>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>نام شرکت</th>
+                    <th>شخص رابط</th>
+                    <th>شماره</th>
+                    <th>نتیجه تماس</th>
+                    <th>تاریخ ثبت</th>
+                    <th>حذف</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for call in calls %}
+                <tr class="clickable-row" data-href="{% url 'marketing:call_detail' call.id %}">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ call.customer.company_name }}</td>
+                    <td>{{ call.contact_person }}</td>
+                    <td>{{ call.mobile }}</td>
+                    <td><span class="badge">{{ call.result }}</span></td>
+                    <td>{{ call.created_at|date:"Y/m/d" }}</td>
+                    <td style="text-align: center;">
+                        <form action="{% url 'marketing:call_delete' call.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="event.stopPropagation(); return confirm('آیا از حذف این رکورد مطمئن هستید؟');" style="background:none; border:none; color:hsl(var(--destructive)); cursor:pointer;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" style="text-align:center;padding:32px">رکوردی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
