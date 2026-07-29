@@ -2,3 +2,6 @@
 db.sqlite3
 sample/
 venv/
+.htaccess
+passenger_wsgi.py
+tmp/
