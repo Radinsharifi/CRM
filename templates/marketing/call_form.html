@@ -9,60 +9,98 @@
     <div class="card">
         <form method="POST">
             {% csrf_token %}
+
+            {% if form.errors %}
+            <div style="background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
+                <p><strong>خطا در ثبت فرم:</strong> لطفا موارد زیر را اصلاح کنید:</p>
+                <ul style="margin-right: 20px; margin-top: 8px;">
+                    {% for field, errors in form.errors.items %}
+                        <li>{{ field }}: {{ errors|striptags }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
             
+            <!-- 1. Customer -->
             <div class="form-group">
-                <label class="form-label" style="display: flex; justify-content: space-between;">
-                    <span>نام شرکت / مشتری *</span>
-                    <a href="javascript:void(0)" onclick="openCustomerModal()" style="font-size: 11px; color: var(--primary); text-decoration: none;">+ مشتری جدید</a>
-                </label>
-                <!-- id_customer specifically targeted in CSS -->
+                <label class="form-label">نام شرکت / مشتری *</label>
                 <select name="customer" class="form-select" required id="id_customer">
+                    <option value="" disabled selected>-- انتخاب مشتری --</option>
                     {% for val, label in form.fields.customer.choices %}
-                        {% if val == "" %}
-                            <option value="" disabled selected>-- انتخاب مشتری --</option>
-                        {% else %}
-                            <option value="{{ val }}" {% if form.customer.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>
-                                {{ label }}
-                            </option>
-                        {% endif %}
+                        {% if val %}<option value="{{ val }}">{{ label }}</option>{% endif %}
                     {% endfor %}
                 </select>
             </div>
 
-            <!-- Manually render other fields to ensure exact layout -->
+            <!-- 2. Field of Activity -->
             <div class="form-group">
                 <label class="form-label">حوزه فعالیت</label>
                 <input type="text" name="field_of_activity" class="form-input" value="{{ form.field_of_activity.value|default:'' }}">
             </div>
 
+            <!-- 3. Contact Person -->
             <div class="form-group">
-                <label class="form-label">نام نفر رابط *</label>
+                <label class="form-label">نام شخص رابط *</label>
                 <input type="text" name="contact_person" class="form-input" required value="{{ form.contact_person.value|default:'' }}">
             </div>
 
+            <!-- 4. Job Title -->
+            <div class="form-group">
+                <label class="form-label">سمت</label>
+                <input type="text" name="job_title" class="form-input" value="{{ form.job_title.value|default:'' }}">
+            </div>
+
+            <!-- 5. Landline -->
+            <div class="form-group">
+                <label class="form-label">تلفن ثابت</label>
+                <input type="text" name="landline" class="form-input" value="{{ form.landline.value|default:'' }}">
+            </div>
+
+            <!-- 6. Mobile -->
             <div class="form-group">
                 <label class="form-label">تلفن همراه *</label>
                 <input type="text" name="mobile" class="form-input" required value="{{ form.mobile.value|default:'' }}">
             </div>
 
+            <!-- 7. Email at Call -->
             <div class="form-group">
-                <label class="form-label">نتیجه تماس</label>
-                <input type="text" name="result" class="form-input" value="{{ form.result.value|default:'' }}">
+                <label class="form-label">آدرس ایمیل</label>
+                <input type="email" name="email_at_call" class="form-input" value="{{ form.email_at_call.value|default:'' }}">
             </div>
 
+            <!-- 8. Website -->
             <div class="form-group">
-                <label class="form-label">تاریخ پیگیری</label>
+                <label class="form-label">وبسایت</label>
+                <input type="url" name="website" class="form-input" value="{{ form.website.value|default:'' }}">
+            </div>
+
+            <!-- 9. Acquisition Source -->
+            <div class="form-group">
+                <label class="form-label">نحوه آشنایی</label>
+                <input type="text" name="acquisition_source" class="form-input" value="{{ form.acquisition_source.value|default:'' }}">
+            </div>
+
+            <!-- 10. Result -->
+            <div class="form-group">
+                <label class="form-label">نتیجه تماس *</label>
+                <input type="text" name="result" class="form-input" required value="{{ form.result.value|default:'' }}">
+            </div>
+
+            <!-- 11. Follow up -->
+            <div class="form-group">
+                <label class="form-label">تاریخ پیگیری بعدی</label>
                 <input type="date" name="follow_up_date" class="form-input" value="{{ form.follow_up_date.value|date:'Y-m-d' }}">
             </div>
 
+            <!-- 12. Notes -->
             <div class="form-group">
                 <label class="form-label">یادداشت‌ها</label>
                 <textarea name="notes" class="form-input" rows="4">{{ form.notes.value|default:'' }}</textarea>
             </div>
 
-            <div class="form-actions" style="margin-top: 24px; display: flex; gap: 12px;">
-                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">ثبت نهایی</button>
-                <a href="{% url 'marketing:call_list' %}" class="btn" style="background: hsl(var(--secondary));">انصراف</a>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">ثبت نهایی اطلاعات</button>
+                <a href="{% url 'marketing:call_list' %}" class="btn btn-secondary">انصراف</a>
             </div>
         </form>
     </div>

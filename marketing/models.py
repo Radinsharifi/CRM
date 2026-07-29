@@ -18,16 +18,15 @@ class Customer(models.Model):
 class CallRecord(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='calls')
     
-    # Fields from your image (Snapshot data)
-    field_of_activity = models.CharField(max_length=255, verbose_name="حوزه فعالیت")
-    contact_person = models.CharField(max_length=255, verbose_name="شخص رابط")
-    job_title = models.CharField(max_length=255, verbose_name="سمت")
-    landline = models.CharField(max_length=20, verbose_name="تلفن ثابت")
-    mobile = models.CharField(max_length=20, verbose_name="تلفن همراه")
+    # Make these Optional so the form submits easily
+    field_of_activity = models.CharField(max_length=255, blank=True, null=True, verbose_name="حوزه فعالیت")
+    contact_person = models.CharField(max_length=255, verbose_name="شخص رابط") # Keep Required
+    job_title = models.CharField(max_length=255, blank=True, null=True, verbose_name="سمت")
+    landline = models.CharField(max_length=20, blank=True, null=True, verbose_name="تلفن ثابت")
+    mobile = models.CharField(max_length=20, verbose_name="تلفن همراه") # Keep Required
     email_at_call = models.EmailField(blank=True, null=True, verbose_name="آدرس ایمیل")
     website = models.URLField(blank=True, null=True, verbose_name="وبسایت")
-    acquisition_source = models.CharField(max_length=255, verbose_name="نحوه آشنایی")
-    first_contact_date = models.DateField(default=timezone.now, verbose_name="تاریخ اولین تماس")
+    acquisition_source = models.CharField(max_length=255, blank=True, null=True, verbose_name="نحوه آشنایی")
     
     # Interaction Details
     result = models.CharField(max_length=255, verbose_name="نتیجه تماس")
