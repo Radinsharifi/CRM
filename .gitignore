@@ -5,3 +5,5 @@ venv/
 .htaccess
 passenger_wsgi.py
 tmp/
+staticfiles/
+stderr.log
