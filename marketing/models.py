@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
 
 def default_follow_up():
     return timezone.now().date() + timedelta(days=3)
@@ -17,7 +18,12 @@ class Customer(models.Model):
 
 class CallRecord(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='calls')
-    
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        verbose_name="ثبت شده توسط"
+    )
     # Make these Optional so the form submits easily
     field_of_activity = models.CharField(max_length=255, blank=True, null=True, verbose_name="حوزه فعالیت")
     contact_person = models.CharField(max_length=255, verbose_name="شخص رابط") # Keep Required

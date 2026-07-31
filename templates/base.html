@@ -5,17 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CRM هوشمند آنی بار</title>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script>
+        (function() {
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                document.documentElement.classList.add('sidebar-is-collapsed');
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="app">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <div class="logo-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>
                 </div>
                 <span class="logo-text">CRM هوشمند آنی بار</span>
             </div>
@@ -30,71 +34,207 @@
                 </a>
                 <a href="{% url 'marketing:call_list' %}" class="nav-item {% if 'call' in request.path %}active{% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z" /><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" /></svg>
-                    <span>بازاریابان</span>
+                    <span>تماس‌ها</span>
                 </a>
             </nav>
-            <!-- ORIGINAL TOGGLE CODE RESTORED -->
             <div class="sidebar-toggle">
-                <button onclick="toggleSidebar()">
-                    <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px">
-                        <path d="m9 18 6-6-6-6" />
-                    </svg>
+                <button type="button" id="sidebar-toggle-button" aria-label="جمع کردن نوار کناری" aria-expanded="true">
+                    <svg id="collapse-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px"><path d="m9 18 6-6-6-6" /></svg>
                     <span>جمع کردن</span>
                 </button>
             </div>
         </aside>
 
+        <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+
         <div class="main-content">
-            <header class="top-header">
-                <div class="header-datetime">
+        <header class="top-header">
+            <div class="header-left" style="margin-right: auto;">
+                
+                <!-- Date/Time Display -->
+                <div class="header-datetime" style="display: inline-block; vertical-align: middle; margin-left: 20px;">
                     <div class="time" id="header-time"></div>
                     <div class="date" id="header-date"></div>
                 </div>
-            </header>
-            <div class="page-content">
-                {% block content %}{% endblock %}
+
+                <!-- EXACT STRUCTURE FROM YOUR SNIPPET -->
+                <div class="dropdown" id="user-dropdown">
+                    <button class="header-user" onclick="toggleDropdown('user-dropdown')">
+                        <div class="user-avatar">
+                            {{ user.username|slice:":1" }}{{ user.last_name|slice:":1" }}
+                        </div>
+                        <div class="user-info">
+                            <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                            <div class="role">مدیریت</div>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--muted-foreground))">
+                            <path d="m6 9 6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    
+                    <div class="dropdown-content">
+                        <div class="dropdown-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg> 
+                            پروفایل
+                        </div>
+                        
+                        <!-- Separator line -->
+                        <div class="dropdown-sep"></div>
+
+                        <!-- Functional Logout -->
+                        <form action="{% url 'users:logout' %}" method="post" id="logout-form" style="display:none;">
+                            {% csrf_token %}
+                        </form>
+                        <div class="dropdown-item destructive" onclick="document.getElementById('logout-form').submit();">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg> 
+                            خروج
+                        </div>
+                    </div>
+                </div>
             </div>
+        </header>
+            <main class="page-content">{% block content %}{% endblock %}</main>
         </div>
     </div>
 
-    <!-- Quick Customer Modal -->
-    <div id="customerModal" class="modal">
-        <div class="modal-content">
-            <h3 style="margin-bottom: 20px;">افزودن سریع مشتری</h3>
-            <form id="quickCustomerForm" method="POST" action="{% url 'marketing:customer_create_js' %}">
+    <!-- Move this to the VERY bottom of base.html, right before </body> -->
+    <div id="customerModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div class="card" style="background: white; padding: 40px; border-radius: var(--radius); width: 90%; max-width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); position: relative;">
+            <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 24px; text-align: right; color: hsl(var(--foreground));">افزودن سریع مشتری</h2>
+            
+            <form method="POST" action="{% url 'marketing:customer_create_js' %}">
                 {% csrf_token %}
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 15px;">
                     <label class="form-label">نام شرکت</label>
                     <input type="text" name="company_name" class="form-input" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">نام رابط</label>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label">نام رابط اصلی</label>
                     <input type="text" name="name" class="form-input" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="margin-bottom: 25px;">
                     <label class="form-label">شماره تماس</label>
                     <input type="text" name="phone_number" class="form-input" required>
                 </div>
-                <div class="form-actions" style="justify-content: flex-end;">
-                    <button type="button" class="btn" onclick="closeCustomerModal()">انصراف</button>
-                    <button type="submit" class="btn btn-primary">ذخیره مشتری</button>
+                
+                <div style="display: flex; gap: 12px; justify-content: flex-start;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center;">ذخیره مشتری</button>
+                    <button type="button" class="btn" onclick="closeCustomerModal()" style="flex: 1; background: hsl(var(--secondary)); justify-content: center;">انصراف</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        function toggleSidebar() {
-            const sb = document.getElementById('sidebar');
-            sb.classList.toggle('collapsed');
-            const icon = document.getElementById('collapse-icon');
-            // Rotate the arrow SVG
-            icon.style.transform = sb.classList.contains('collapsed') ? 'rotate(180deg)' : 'rotate(0deg)';
+        function openCustomerModal() {
+            console.log("Forcing Modal Open...");
+            const modal = document.getElementById('customerModal');
+            if (modal) {
+                // Force display via JS style property to bypass CSS conflicts
+                modal.style.display = 'flex';
+            }
         }
+
+        function closeCustomerModal() {
+            const modal = document.getElementById('customerModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close if clicking the dark background
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('customerModal');
+            if (event.target === modal) {
+                closeCustomerModal();
+            }
+        });
+        const sb = document.getElementById('sidebar');
+        const icon = document.getElementById('collapse-icon');
+        const toggleButton = document.getElementById('sidebar-toggle-button');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        const root = document.documentElement;
+        const storageKey = 'sidebar-collapsed';
+        const mobileBreakpoint = 768;
+
+        function isMobile() {
+            return window.innerWidth <= mobileBreakpoint;
+        }
+
+        function updateSidebarUI(isCollapsed, persist = true) {
+            const mobile = isMobile();
+            root.classList.toggle('sidebar-collapsed', isCollapsed);
+            sb.classList.toggle('collapsed', isCollapsed && !mobile);
+            sb.classList.toggle('is-open', !isCollapsed && mobile);
+
+            if (backdrop) {
+                const showBackdrop = mobile && !isCollapsed;
+                backdrop.classList.toggle('active', showBackdrop);
+                backdrop.hidden = !showBackdrop;
+            }
+
+            if (toggleButton) {
+                toggleButton.setAttribute('aria-expanded', String(!isCollapsed));
+                toggleButton.setAttribute('aria-label', isCollapsed ? 'باز کردن نوار کناری' : 'جمع کردن نوار کناری');
+            }
+
+            if (icon) {
+                icon.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+
+            const label = toggleButton ? toggleButton.querySelector('span') : null;
+            if (label) {
+                label.textContent = isCollapsed ? 'باز کردن' : 'جمع کردن';
+            }
+
+            if (persist) {
+                localStorage.setItem(storageKey, String(isCollapsed));
+            }
+        }
+
+        function getDefaultCollapsedState() {
+            return isMobile();
+        }
+
+        function syncSidebarState() {
+            const storedValue = localStorage.getItem(storageKey);
+            const isCollapsed = storedValue !== null ? storedValue === 'true' : getDefaultCollapsedState();
+            updateSidebarUI(isCollapsed, false);
+        }
+
+        window.toggleSidebar = function() {
+            const currentCollapsed = isMobile() ? !sb.classList.contains('is-open') : sb.classList.contains('collapsed');
+            updateSidebarUI(!currentCollapsed, true);
+        };
+
+        if (toggleButton) {
+            toggleButton.addEventListener('click', window.toggleSidebar);
+        }
+
+        if (backdrop) {
+            backdrop.addEventListener('click', function () {
+                updateSidebarUI(true, true);
+            });
+        }
+
+        window.addEventListener('resize', function () {
+            const storedValue = localStorage.getItem(storageKey);
+            const isCollapsed = storedValue !== null ? storedValue === 'true' : getDefaultCollapsedState();
+            updateSidebarUI(isCollapsed, false);
+        });
+
+        syncSidebarState();
 
         document.addEventListener('click', function (e) {
             const row = e.target.closest('.clickable-row');
-            if (row && !e.target.closest('a') && !e.target.closest('button')) {
+            if (row && !e.target.closest('a') && !e.target.closest('button') && !e.target.closest('form')) {
                 window.location.href = row.dataset.href;
             }
         });
@@ -105,15 +245,25 @@
             document.getElementById('header-date').textContent = now.toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
         }
         updateDateTime(); setInterval(updateDateTime, 60000);
-
-        function openCustomerModal() { document.getElementById('customerModal').classList.add('active'); }
-        function closeCustomerModal() { document.getElementById('customerModal').classList.remove('active'); }
-        
-        // Close modal if clicking outside
-        window.onclick = function(event) {
-            let modal = document.getElementById('customerModal');
-            if (event.target == modal) closeCustomerModal();
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            const isOpen = dropdown.classList.contains('open');
+            
+            // Close all other dropdowns first
+            document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+            
+            // Toggle current
+            if (!isOpen) {
+                dropdown.classList.add('open');
+            }
         }
+
+        // Close when clicking outside
+        window.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+            }
+        });
     </script>
 </body>
 </html>

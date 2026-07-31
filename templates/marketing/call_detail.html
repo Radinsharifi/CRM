@@ -20,6 +20,12 @@
     </div>
 
     <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 class="card-title" style="margin:0;">گزارش ثبت شده</h3>
+            <div style="font-size:12px; color:hsl(var(--muted-foreground));">
+                ثبت شده توسط: <strong>{{ object.created_by.get_full_name }}</strong>
+            </div>
+        </div>
         <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات بازاریابی</h3>
         <p style="margin-bottom:8px;"><strong>نحوه آشنایی:</strong> {{ object.acquisition_source }}</p>
         <p style="margin-bottom:8px;"><strong>وبسایت:</strong> <a href="{{ object.website }}" target="_blank">{{ object.website|default:"-" }}</a></p>

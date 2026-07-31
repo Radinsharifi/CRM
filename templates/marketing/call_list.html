@@ -18,6 +18,7 @@
                     <th>شخص رابط</th>
                     <th>شماره</th>
                     <th>نتیجه تماس</th>
+                    <th>بازاریاب(ثبت کننده)</th>
                     <th>تاریخ ثبت</th>
                     <th>حذف</th>
                 </tr>
@@ -30,6 +31,13 @@
                     <td>{{ call.contact_person }}</td>
                     <td>{{ call.mobile }}</td>
                     <td><span class="badge">{{ call.result }}</span></td>
+                    <td>
+                        {% if call.created_by %}
+                            {{ call.created_by.get_full_name|default:call.created_by.username }}
+                        {% else %}
+                            <span style="color:hsl(var(--muted-foreground)); font-style: italic;">ثبت نشده</span>
+                        {% endif %}
+                    </td>
                     <td>{{ call.created_at|date:"Y/m/d" }}</td>
                     <td style="text-align: center;">
                         <form action="{% url 'marketing:call_delete' call.id %}" method="POST" style="display:inline;">

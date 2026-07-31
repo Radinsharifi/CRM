@@ -15,4 +15,5 @@ urlpatterns = [
     path('calls/add/', views.CallCreateView.as_view(), name='call_create'),
     path('calls/<int:pk>/delete/', views.CallDeleteView.as_view(), name='call_delete'),
     path('customers/quick-add/', views.QuickCustomerCreateView.as_view(), name='customer_create_js'),
+    
 ]

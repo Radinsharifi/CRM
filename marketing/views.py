@@ -2,9 +2,10 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DeleteView, TemplateView, DetailView, View
 from django.utils import timezone
 from django.shortcuts import redirect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Customer, CallRecord
 
-class DashboardView(TemplateView):
+class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'marketing/dashboard.html'
 
     def get_context_data(self, **kwargs):
@@ -17,12 +18,12 @@ class DashboardView(TemplateView):
         return context
 
 # --- CUSTOMER PAGES ---
-class CustomerListView(ListView):
+class CustomerListView(LoginRequiredMixin, ListView):
     model = Customer
     template_name = 'marketing/customer_list.html'
     context_object_name = 'customers'
 
-class CustomerDetailView(DetailView):
+class CustomerDetailView(LoginRequiredMixin, DetailView):
     model = Customer
     template_name = 'marketing/customer_detail.html'
     
@@ -32,23 +33,23 @@ class CustomerDetailView(DetailView):
         context['call_history'] = self.object.calls.all().order_by('-created_at')
         return context
 
-class CustomerCreateView(CreateView):
+class CustomerCreateView(LoginRequiredMixin, CreateView):
     model = Customer
     template_name = 'marketing/customer_form.html'
     fields = ['name', 'company_name', 'phone_number', 'email']
     success_url = reverse_lazy('marketing:customer_list')
 
 # --- CALL RECORD PAGES ---
-class CallListView(ListView):
+class CallListView(LoginRequiredMixin, ListView):
     model = CallRecord
     template_name = 'marketing/call_list.html'
     context_object_name = 'calls'
 
-class CallDetailView(DetailView):
+class CallDetailView(LoginRequiredMixin, DetailView):
     model = CallRecord
     template_name = 'marketing/call_detail.html'
 
-class CallCreateView(CreateView):
+class CallCreateView(LoginRequiredMixin, CreateView):
     model = CallRecord
     template_name = 'marketing/call_form.html'
     fields = [
@@ -57,13 +58,18 @@ class CallCreateView(CreateView):
         'acquisition_source', 'result', 'notes', 'follow_up_date'
     ]
     success_url = reverse_lazy('marketing:call_list')
+    
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
-class CallDeleteView(DeleteView):
+
+class CallDeleteView(LoginRequiredMixin, DeleteView):
     model = CallRecord
     template_name = 'marketing/call_confirm_delete.html'
     success_url = reverse_lazy('marketing:call_list')
     
-class QuickCustomerCreateView(View):
+class QuickCustomerCreateView(LoginRequiredMixin, View):
     def post(self, request):
         company = request.POST.get('company_name')
         name = request.POST.get('name')

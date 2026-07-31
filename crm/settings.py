@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'marketing',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -120,3 +121,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [ BASE_DIR / "static",]
 STATIC_ROOT = 'staticfiles'
+
+# Auth settings
+LOGIN_REDIRECT_URL = 'marketing:dashboard'
+LOGOUT_REDIRECT_URL = 'users:login'
+LOGIN_URL = 'users:login'
+LOGOUT_REDIRECT_URL = 'users:login'

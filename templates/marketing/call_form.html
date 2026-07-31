@@ -23,13 +23,21 @@
             
             <!-- 1. Customer -->
             <div class="form-group">
-                <label class="form-label">نام شرکت / مشتری *</label>
+                <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>نام شرکت / مشتری *</span>
+                    <button type="button" onclick="openCustomerModal()" style="background:none; border:none; font-size: 11px; color: hsl(var(--primary)); cursor: pointer; font-weight: 700;">
+                        + افزودن سریع مشتری
+                    </button>
+                </label>
                 <select name="customer" class="form-select" required id="id_customer">
-                    <option value="" disabled selected>-- انتخاب مشتری --</option>
+                    <option value="" disabled selected>-- انتخاب از لیست --</option>
                     {% for val, label in form.fields.customer.choices %}
-                        {% if val %}<option value="{{ val }}">{{ label }}</option>{% endif %}
+                        {% if val %}
+                            <option value="{{ val }}" {% if form.customer.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
+                <div class="form-error">{{ form.customer.errors.0 }}</div>
             </div>
 
             <!-- 2. Field of Activity -->

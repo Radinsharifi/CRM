@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود به سیستم | آنی بار</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: hsl(var(--background));
+            min-height: 100vh;
+            margin: 0;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+        }
+        .login-logo {
+            width: 56px; height: 56px; border-radius: 14px;
+            background: linear-gradient(135deg, hsl(var(--primary)), hsl(221 83% 63%));
+            margin: 0 auto 24px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; box-shadow: 0 10px 20px -5px hsl(var(--primary)/.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="card login-card">
+        <div class="login-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" /><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" /><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+            </svg>
+        </div>
+        <h1 style="font-size: 24px; font-weight: 900; margin-bottom: 8px;">ورود به سیستم</h1>
+        <p style="color: hsl(var(--muted-foreground)); font-size: 13px; margin-bottom: 32px;">پنل مدیریت هوشمند آنی بار</p>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div style="background: #fff5f5; color: #c53030; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 13px;">
+                    نام کاربری یا رمز عبور نامعتبر است.
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-label">نام کاربری</label>
+                <input type="text" name="username" class="form-input" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">رمز عبور</label>
+                <input type="password" name="password" class="form-input" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; height: 48px; margin-top: 10px;">
+                ورود به پنل
+            </button>
+        </form>
+    </div>
+</body>
+</html>

@@ -7,4 +7,4 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(CallRecord)
 class CallRecordAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'contact_person', 'result', 'created_at')
+    list_display = ('customer', 'contact_person', 'result', 'created_at', 'created_by')
