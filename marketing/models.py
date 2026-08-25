@@ -11,6 +11,12 @@ class Customer(models.Model):
     company_name = models.CharField(max_length=255, verbose_name="نام شرکت")
     phone_number = models.CharField(max_length=20, verbose_name="شماره تماس")
     email = models.EmailField(blank=True, null=True, verbose_name="ایمیل")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name="ثبت شده توسط"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
