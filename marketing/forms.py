@@ -4,7 +4,11 @@ from .models import CallRecord, Customer
 class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
-        fields = ['company_name', 'name', 'phone_number', 'email']
+        fields = [
+            'name', 'company_name', 'phone_number', 'email',
+            'field_of_activity', 'job_title', 'landline', 'mobile',
+            'website', 'acquisition_source'
+        ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -15,12 +19,9 @@ class CallRecordForm(forms.ModelForm):
     class Meta:
         model = CallRecord
         fields = [
-            'customer', 'field_of_activity', 'contact_person', 
-            'job_title', 'landline', 'mobile', 'email_at_call', 
-            'website', 'acquisition_source', 'result', 'notes', 'follow_up_date'
+            'customer', 'result', 'notes', 'follow_up_date'
         ]
         widgets = {
-            'first_contact_date': forms.DateInput(attrs={'type': 'date'}),
             'follow_up_date': forms.DateInput(attrs={'type': 'date'}),
         }
 

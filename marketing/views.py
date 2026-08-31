@@ -83,9 +83,7 @@ class CallCreateView(LoginRequiredMixin, CreateView):
     model = CallRecord
     template_name = 'marketing/call_form.html'
     fields = [
-        'customer', 'field_of_activity', 'contact_person', 'job_title', 
-        'landline', 'mobile', 'email_at_call', 'website', 
-        'acquisition_source', 'result', 'notes', 'follow_up_date'
+        'customer', 'result', 'notes', 'follow_up_date'
     ]
     success_url = reverse_lazy('marketing:call_list')
 

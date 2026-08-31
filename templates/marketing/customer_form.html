@@ -8,6 +8,9 @@
     <form method="POST">
         {% csrf_token %}
         
+        <!-- Contact Info Section -->
+        <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 16px; color: hsl(var(--foreground));">اطلاعات تماس</h3>
+        
         <div class="form-group">
             <label class="form-label">نام شرکت *</label>
             <input type="text" name="company_name" class="form-input" required value="{{ form.company_name.value|default_if_none:'' }}">
@@ -21,8 +24,20 @@
         </div>
 
         <div class="form-group">
-            <label class="form-label">شماره تماس *</label>
-            <input type="text" name="phone_number" class="form-input" required value="{{ form.phone_number.value|default_if_none:'' }}">
+            <label class="form-label">تلفن همراه</label>
+            <input type="text" name="mobile" class="form-input" value="{{ form.mobile.value|default_if_none:'' }}">
+            <div class="form-error">{{ form.mobile.errors.0 }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">تلفن ثابت</label>
+            <input type="text" name="landline" class="form-input" value="{{ form.landline.value|default_if_none:'' }}">
+            <div class="form-error">{{ form.landline.errors.0 }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">شماره تماس دیگر</label>
+            <input type="text" name="phone_number" class="form-input" value="{{ form.phone_number.value|default_if_none:'' }}">
             <div class="form-error">{{ form.phone_number.errors.0 }}</div>
         </div>
 
@@ -32,7 +47,34 @@
             <div class="form-error">{{ form.email.errors.0 }}</div>
         </div>
 
-        <div class="form-actions">
+        <!-- Business Info Section -->
+        <h3 style="font-size: 14px; font-weight: 700; margin-top: 24px; margin-bottom: 16px; color: hsl(var(--foreground));">اطلاعات کسب‌وکار</h3>
+
+        <div class="form-group">
+            <label class="form-label">حوزه فعالیت</label>
+            <input type="text" name="field_of_activity" class="form-input" value="{{ form.field_of_activity.value|default_if_none:'' }}">
+            <div class="form-error">{{ form.field_of_activity.errors.0 }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">سمت</label>
+            <input type="text" name="job_title" class="form-input" value="{{ form.job_title.value|default_if_none:'' }}">
+            <div class="form-error">{{ form.job_title.errors.0 }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">وبسایت</label>
+            <input type="url" name="website" class="form-input" value="{{ form.website.value|default_if_none:'' }}">
+            <div class="form-error">{{ form.website.errors.0 }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">نحوه آشنایی</label>
+            <input type="text" name="acquisition_source" class="form-input" value="{{ form.acquisition_source.value|default_if_none:'' }}">
+            <div class="form-error">{{ form.acquisition_source.errors.0 }}</div>
+        </div>
+
+        <div class="form-actions" style="margin-top: 24px;">
             <button type="submit" class="btn btn-primary">ذخیره مشتری</button>
             <a href="{% url 'marketing:customer_list' %}" class="btn btn-secondary">انصراف</a>
         </div>

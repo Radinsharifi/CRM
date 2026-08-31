@@ -3,8 +3,8 @@ from .models import Customer, CallRecord
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ('company_name', 'name', 'phone_number')
+    list_display = ('company_name', 'name', 'phone_number', 'field_of_activity', 'created_by')
 
 @admin.register(CallRecord)
 class CallRecordAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'contact_person', 'result', 'created_at', 'created_by')
+    list_display = ('customer', 'result', 'created_at', 'created_by')

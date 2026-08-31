@@ -17,14 +17,40 @@
 <div class="grid grid-2" style="margin-bottom:24px;">
     <div class="card">
         <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات تماس</h3>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+        <div style="display:grid; gap:12px;">
             <div>
                 <div style="font-size:12px; color:hsl(var(--muted-foreground));">تلفن همراه</div>
-                <div style="font-size:14px; font-weight:500;">{{ object.phone_number }}</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.mobile|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">تلفن ثابت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.landline|default:"ثبت نشده" }}</div>
             </div>
             <div>
                 <div style="font-size:12px; color:hsl(var(--muted-foreground));">ایمیل</div>
                 <div style="font-size:14px; font-weight:500;">{{ object.email|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">وبسایت</div>
+                <div style="font-size:14px; font-weight:500;">{% if object.website %}<a href="{{ object.website }}" target="_blank">{{ object.website }}</a>{% else %}ثبت نشده{% endif %}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات کسب‌وکار</h3>
+        <div style="display:grid; gap:12px;">
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">حوزه فعالیت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.field_of_activity|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">سمت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.job_title|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">نحوه آشنایی</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.acquisition_source|default:"ثبت نشده" }}</div>
             </div>
             <div>
                 <div style="font-size:12px; color:hsl(var(--muted-foreground));">تاریخ ثبت</div>
@@ -32,12 +58,12 @@
             </div>
         </div>
     </div>
+</div>
 
-    <div class="card">
-        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">خلاصه فعالیت‌ها</h3>
-        <div style="font-size:24px; font-weight:700; color:hsl(var(--primary));">{{ call_history.count }}</div>
-        <div style="font-size:12px; color:hsl(var(--muted-foreground));">تعداد کل تماس‌های ثبت شده با این شرکت</div>
-    </div>
+<div class="card" style="margin-bottom:24px;">
+    <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">خلاصه فعالیت‌ها</h3>
+    <div style="font-size:24px; font-weight:700; color:hsl(var(--primary));">{{ call_history.count }}</div>
+    <div style="font-size:12px; color:hsl(var(--muted-foreground));">تعداد کل تماس‌های ثبت شده با این شرکت</div>
 </div>
 
 <div class="card">
@@ -47,7 +73,7 @@
             <thead>
                 <tr>
                     <th>تاریخ تماس</th>
-                    <th>شخص رابط در تماس</th>
+                    <th>ثبت کننده</th>
                     <th>نتیجه</th>
                     <th>پیگیری بعدی</th>
                 </tr>
@@ -56,7 +82,7 @@
                 {% for call in call_history %}
                 <tr class="clickable-row" data-href="{% url 'marketing:call_detail' call.id %}">
                     <td>{{ call.created_at|date:"Y/m/d H:i" }}</td>
-                    <td>{{ call.contact_person }}</td>
+                    <td>{% if call.created_by %}{{ call.created_by.get_full_name|default:call.created_by.username }}{% else %}<span style="color:hsl(var(--muted-foreground)); font-style: italic;">ثبت نشده</span>{% endif %}</td>
                     <td><span class="badge">{{ call.result }}</span></td>
                     <td>{{ call.follow_up_date|default:"-" }}</td>
                 </tr>

@@ -43,8 +43,6 @@ class OwnershipVisibilityTests(TestCase):
 		return CallRecord.objects.create(
 			customer=customer,
 			created_by=created_by,
-			contact_person='Contact',
-			mobile='09120000000',
 			result='Successful',
 			follow_up_date=timezone.localdate(),
 		)

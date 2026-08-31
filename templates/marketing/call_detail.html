@@ -11,32 +11,51 @@
 
 <div class="grid grid-2" style="margin-bottom:24px;">
     <div class="card">
-        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات شرکت و شخص</h3>
-        <p style="margin-bottom:8px;"><strong>حوزه فعالیت:</strong> {{ object.field_of_activity }}</p>
-        <p style="margin-bottom:8px;"><strong>شخص رابط:</strong> {{ object.contact_person }}</p>
-        <p style="margin-bottom:8px;"><strong>سمت:</strong> {{ object.job_title }}</p>
-        <p style="margin-bottom:8px;"><strong>تلفن همراه:</strong> {{ object.mobile }}</p>
-        <p style="margin-bottom:8px;"><strong>تلفن ثابت:</strong> {{ object.landline }}</p>
+        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات شرکت</h3>
+        <div style="display:grid; gap:12px;">
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">نام شرکت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.customer.company_name }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">رابط اصلی</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.customer.name }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">حوزه فعالیت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.customer.field_of_activity|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">سمت</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.customer.job_title|default:"ثبت نشده" }}</div>
+            </div>
+        </div>
     </div>
 
     <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 class="card-title" style="margin:0;">گزارش ثبت شده</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 class="card-title" style="margin:0; font-size:16px;">جزئیات تماس</h3>
             <div style="font-size:12px; color:hsl(var(--muted-foreground));">
-                ثبت شده توسط: <strong>{{ object.created_by.get_full_name }}</strong>
+                ثبت شده توسط: <strong>{% if object.created_by %}{{ object.created_by.get_full_name|default:object.created_by.username }}{% else %}ثبت نشده{% endif %}</strong>
             </div>
         </div>
-        <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات بازاریابی</h3>
-        <p style="margin-bottom:8px;"><strong>نحوه آشنایی:</strong> {{ object.acquisition_source }}</p>
-        <p style="margin-bottom:8px;"><strong>وبسایت:</strong> <a href="{{ object.website }}" target="_blank">{{ object.website|default:"-" }}</a></p>
-        <p style="margin-bottom:8px;"><strong>ایمیل:</strong> {{ object.email_at_call|default:"-" }}</p>
-        <p style="margin-bottom:8px;"><strong>نتیجه تماس:</strong> <span class="badge">{{ object.result }}</span></p>
-        <p style="margin-bottom:8px;"><strong>تاریخ پیگیری:</strong> {{ object.follow_up_date|default:"-" }}</p>
+        <div style="display:grid; gap:12px;">
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">نتیجه تماس</div>
+                <div style="font-size:14px; font-weight:500;"><span class="badge">{{ object.result }}</span></div>
+            </div>
+            <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">تاریخ پیگیری</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.follow_up_date|default:"ثبت نشده" }}</div>
+            </div>
+        </div>
     </div>
 </div>
 
+{% if object.notes %}
 <div class="card">
     <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">یادداشت‌های گفتگو</h3>
     <div style="background:hsl(var(--muted)/.3); padding:16px; border-radius:var(--radius); white-space: pre-wrap;">{{ object.notes }}</div>
 </div>
+{% endif %}
 {% endblock %}

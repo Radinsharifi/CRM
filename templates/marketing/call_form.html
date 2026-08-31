@@ -40,70 +40,25 @@
                 <div class="form-error">{{ form.customer.errors.0 }}</div>
             </div>
 
-            <!-- 2. Field of Activity -->
-            <div class="form-group">
-                <label class="form-label">حوزه فعالیت</label>
-                <input type="text" name="field_of_activity" class="form-input" value="{{ form.field_of_activity.value|default:'' }}">
-            </div>
-
-            <!-- 3. Contact Person -->
-            <div class="form-group">
-                <label class="form-label">نام شخص رابط *</label>
-                <input type="text" name="contact_person" class="form-input" required value="{{ form.contact_person.value|default:'' }}">
-            </div>
-
-            <!-- 4. Job Title -->
-            <div class="form-group">
-                <label class="form-label">سمت</label>
-                <input type="text" name="job_title" class="form-input" value="{{ form.job_title.value|default:'' }}">
-            </div>
-
-            <!-- 5. Landline -->
-            <div class="form-group">
-                <label class="form-label">تلفن ثابت</label>
-                <input type="text" name="landline" class="form-input" value="{{ form.landline.value|default:'' }}">
-            </div>
-
-            <!-- 6. Mobile -->
-            <div class="form-group">
-                <label class="form-label">تلفن همراه *</label>
-                <input type="text" name="mobile" class="form-input" required value="{{ form.mobile.value|default:'' }}">
-            </div>
-
-            <!-- 7. Email at Call -->
-            <div class="form-group">
-                <label class="form-label">آدرس ایمیل</label>
-                <input type="email" name="email_at_call" class="form-input" value="{{ form.email_at_call.value|default:'' }}">
-            </div>
-
-            <!-- 8. Website -->
-            <div class="form-group">
-                <label class="form-label">وبسایت</label>
-                <input type="url" name="website" class="form-input" value="{{ form.website.value|default:'' }}">
-            </div>
-
-            <!-- 9. Acquisition Source -->
-            <div class="form-group">
-                <label class="form-label">نحوه آشنایی</label>
-                <input type="text" name="acquisition_source" class="form-input" value="{{ form.acquisition_source.value|default:'' }}">
-            </div>
-
-            <!-- 10. Result -->
+            <!-- 2. Result -->
             <div class="form-group">
                 <label class="form-label">نتیجه تماس *</label>
                 <input type="text" name="result" class="form-input" required value="{{ form.result.value|default:'' }}">
+                <div class="form-error">{{ form.result.errors.0 }}</div>
             </div>
 
-            <!-- 11. Follow up -->
+            <!-- 3. Follow up -->
             <div class="form-group">
                 <label class="form-label">تاریخ پیگیری بعدی</label>
                 <input type="date" name="follow_up_date" class="form-input" value="{{ form.follow_up_date.value|date:'Y-m-d' }}">
+                <div class="form-error">{{ form.follow_up_date.errors.0 }}</div>
             </div>
 
-            <!-- 12. Notes -->
+            <!-- 4. Notes -->
             <div class="form-group">
                 <label class="form-label">یادداشت‌ها</label>
                 <textarea name="notes" class="form-input" rows="4">{{ form.notes.value|default:'' }}</textarea>
+                <div class="form-error">{{ form.notes.errors.0 }}</div>
             </div>
 
             <div class="form-actions">

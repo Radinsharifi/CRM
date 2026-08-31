@@ -11,6 +11,12 @@ class Customer(models.Model):
     company_name = models.CharField(max_length=255, verbose_name="نام شرکت")
     phone_number = models.CharField(max_length=20, verbose_name="شماره تماس")
     email = models.EmailField(blank=True, null=True, verbose_name="ایمیل")
+    field_of_activity = models.CharField(max_length=255, blank=True, null=True, verbose_name="حوزه فعالیت")
+    job_title = models.CharField(max_length=255, blank=True, null=True, verbose_name="سمت")
+    landline = models.CharField(max_length=20, blank=True, null=True, verbose_name="تلفن ثابت")
+    mobile = models.CharField(max_length=20, blank=True, null=True, verbose_name="تلفن همراه")
+    website = models.URLField(blank=True, null=True, verbose_name="وبسایت")
+    acquisition_source = models.CharField(max_length=255, blank=True, null=True, verbose_name="نحوه آشنایی")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -30,15 +36,6 @@ class CallRecord(models.Model):
         null=True, 
         verbose_name="ثبت شده توسط"
     )
-    # Make these Optional so the form submits easily
-    field_of_activity = models.CharField(max_length=255, blank=True, null=True, verbose_name="حوزه فعالیت")
-    contact_person = models.CharField(max_length=255, verbose_name="شخص رابط") # Keep Required
-    job_title = models.CharField(max_length=255, blank=True, null=True, verbose_name="سمت")
-    landline = models.CharField(max_length=20, blank=True, null=True, verbose_name="تلفن ثابت")
-    mobile = models.CharField(max_length=20, verbose_name="تلفن همراه") # Keep Required
-    email_at_call = models.EmailField(blank=True, null=True, verbose_name="آدرس ایمیل")
-    website = models.URLField(blank=True, null=True, verbose_name="وبسایت")
-    acquisition_source = models.CharField(max_length=255, blank=True, null=True, verbose_name="نحوه آشنایی")
     
     # Interaction Details
     result = models.CharField(max_length=255, verbose_name="نتیجه تماس")
