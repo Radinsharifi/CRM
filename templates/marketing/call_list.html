@@ -15,7 +15,6 @@
                 <tr>
                     <th>ردیف</th>
                     <th>نام شرکت</th>
-                    <th>رابط اصلی</th>
                     <th>نتیجه تماس</th>
                     <th>بازاریاب(ثبت کننده)</th>
                     <th>تاریخ ثبت</th>
@@ -27,7 +26,6 @@
                 <tr class="clickable-row" data-href="{% url 'marketing:call_detail' call.id %}">
                     <td>{{ forloop.counter }}</td>
                     <td>{{ call.customer.company_name }}</td>
-                    <td>{{ call.customer.name }}</td>
                     <td><span class="badge">{{ call.result }}</span></td>
                     <td>
                         {% if call.created_by %}

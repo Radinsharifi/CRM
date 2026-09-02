@@ -43,7 +43,7 @@
             <!-- 2. Result -->
             <div class="form-group">
                 <label class="form-label">نتیجه تماس *</label>
-                <input type="text" name="result" class="form-input" required value="{{ form.result.value|default:'' }}">
+                <textarea name="result" class="form-input" rows="4" maxlength="2000" required>{{ form.result.value|default:'' }}</textarea>
                 <div class="form-error">{{ form.result.errors.0 }}</div>
             </div>
 

@@ -56,7 +56,11 @@ class CustomerDetailView(LoginRequiredMixin, DetailView):
 class CustomerCreateView(LoginRequiredMixin, CreateView):
     model = Customer
     template_name = 'marketing/customer_form.html'
-    fields = ['name', 'company_name', 'phone_number', 'email']
+    fields = [
+        'company_name', 'full_name', 'phone_number', 'email',
+        'field_of_activity', 'job_title', 'landline', 'mobile',
+        'website', 'acquisition_source'
+    ]
     success_url = reverse_lazy('marketing:customer_list')
 
     def form_valid(self, form):
@@ -108,14 +112,14 @@ class CallDeleteView(LoginRequiredMixin, DeleteView):
 class QuickCustomerCreateView(LoginRequiredMixin, View):
     def post(self, request):
         company = request.POST.get('company_name')
-        name = request.POST.get('name')
+        full_name = request.POST.get('full_name')
         phone = request.POST.get('phone_number')
         
-        if company and name and phone:
+        if company and full_name:
             Customer.objects.create(
                 company_name=company,
-                name=name,
-                phone_number=phone,
+                full_name=full_name,
+                phone_number=phone or '',
                 created_by=request.user
             )
             # Redirect back to the call add page

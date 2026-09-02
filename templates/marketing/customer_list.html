@@ -15,7 +15,8 @@
                 <tr>
                     <th>ردیف</th>
                     <th>نام شرکت</th>
-                    <th>نام رابط</th>
+                    <th>نام نام خانوادگی</th>
+                    <th>رابط</th>
                     <th>شماره تماس</th>
                     <th>ایمیل</th>
                     <th>تاریخ ثبت</th>
@@ -26,13 +27,14 @@
                 <tr class="clickable-row" data-href="{% url 'marketing:customer_detail' customer.id %}">
                     <td>{{ forloop.counter }}</td>
                     <td><strong>{{ customer.company_name }}</strong></td>
-                    <td>{{ customer.name }}</td>
+                    <td>{{ customer.full_name }}</td>
+                    <td>{% if customer.created_by %}{{ customer.created_by.get_full_name|default:customer.created_by.username }}{% else %}<span style="color:hsl(var(--muted-foreground)); font-style: italic;">ثبت نشده</span>{% endif %}</td>
                     <td>{{ customer.phone_number }}</td>
                     <td>{{ customer.email|default:"-" }}</td>
                     <td>{{ customer.created_at|date:"Y/m/d" }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="6" style="text-align:center;padding:32px">هیچ مشتری یافت نشد.</td></tr>
+                <tr><td colspan="7" style="text-align:center;padding:32px">هیچ مشتری یافت نشد.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

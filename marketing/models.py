@@ -7,9 +7,9 @@ def default_follow_up():
     return timezone.now().date() + timedelta(days=3)
 
 class Customer(models.Model):
-    name = models.CharField(max_length=255, verbose_name="نام رابط اصلی")
+    full_name = models.CharField(max_length=255, verbose_name="نام نام خانوادگی")
     company_name = models.CharField(max_length=255, verbose_name="نام شرکت")
-    phone_number = models.CharField(max_length=20, verbose_name="شماره تماس")
+    phone_number = models.CharField(max_length=20, blank=True, verbose_name="شماره تماس")
     email = models.EmailField(blank=True, null=True, verbose_name="ایمیل")
     field_of_activity = models.CharField(max_length=255, blank=True, null=True, verbose_name="حوزه فعالیت")
     job_title = models.CharField(max_length=255, blank=True, null=True, verbose_name="سمت")
@@ -26,7 +26,7 @@ class Customer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.company_name} ({self.name})"
+        return f"{self.company_name} ({self.full_name})"
 
 class CallRecord(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='calls')
@@ -38,7 +38,7 @@ class CallRecord(models.Model):
     )
     
     # Interaction Details
-    result = models.CharField(max_length=255, verbose_name="نتیجه تماس")
+    result = models.TextField(max_length=2000, verbose_name="نتیجه تماس")
     notes = models.TextField(blank=True, verbose_name="یادداشت‌ها")
     follow_up_date = models.DateField(default=default_follow_up, verbose_name="تاریخ پیگیری")
     created_at = models.DateTimeField(auto_now_add=True)

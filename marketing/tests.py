@@ -19,19 +19,19 @@ class OwnershipVisibilityTests(TestCase):
 			username='admin', password='password', email='admin@example.com'
 		)
 		self.customer = Customer.objects.create(
-			name='First Contact',
+			full_name='First Contact Full Name',
 			company_name='First Company',
 			phone_number='1111111111',
 			created_by=self.marketer,
 		)
 		self.other_customer = Customer.objects.create(
-			name='Second Contact',
+			full_name='Second Contact Full Name',
 			company_name='Second Company',
 			phone_number='2222222222',
 			created_by=self.other_marketer,
 		)
 		self.legacy_customer = Customer.objects.create(
-			name='Legacy Contact',
+			full_name='Legacy Contact Full Name',
 			company_name='Legacy Company',
 			phone_number='3333333333',
 		)
@@ -126,7 +126,7 @@ class OwnershipVisibilityTests(TestCase):
 		self.client.post(
 			reverse('marketing:customer_create'),
 			{
-				'name': 'New Contact',
+				'full_name': 'New Contact Full Name',
 				'company_name': 'New Company',
 				'phone_number': '4444444444',
 			},
@@ -134,7 +134,7 @@ class OwnershipVisibilityTests(TestCase):
 		self.client.post(
 			reverse('marketing:customer_create_js'),
 			{
-				'name': 'Quick Contact',
+				'full_name': 'Quick Contact Full Name',
 				'company_name': 'Quick Company',
 				'phone_number': '5555555555',
 			},
