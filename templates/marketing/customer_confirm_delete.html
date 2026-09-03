@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}حذف مشتری{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">حذف مشتری</h1>
+</div>
+
+<div class="card" style="max-width: 500px;">
+    <p style="margin-bottom: 20px;">آیا مطمئن هستید که می‌خواهید مشتری <strong>{{ object.company_name }}</strong> را حذف کنید؟</p>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-actions">
+            <button type="submit" class="btn" style="background: hsl(var(--destructive)); color: white;">بله، حذف شود</button>
+            <a href="{% url 'marketing:customer_detail' object.pk %}" class="btn" style="background: hsl(var(--secondary));">انصراف</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

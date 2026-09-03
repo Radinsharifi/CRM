@@ -174,4 +174,59 @@ class OwnershipVisibilityTests(TestCase):
 			list(customer_detail.context['call_history']), [self.call]
 		)
 
+	def test_owner_can_edit_customer_and_call_with_prefilled_data(self):
+		self.client.force_login(self.marketer)
+
+		customer_response = self.client.get(
+			reverse('marketing:customer_update', args=[self.customer.pk])
+		)
+		call_response = self.client.get(
+			reverse('marketing:call_update', args=[self.call.pk])
+		)
+
+		self.assertContains(customer_response, 'First Company')
+		self.assertContains(customer_response, 'First Contact Full Name')
+		self.assertContains(call_response, 'Successful')
+
+	def test_owner_can_delete_customer_and_call(self):
+		self.client.force_login(self.marketer)
+
+		self.assertEqual(
+			self.client.post(
+				reverse('marketing:call_delete', args=[self.call.pk])
+			).status_code,
+			302,
+		)
+		self.assertFalse(CallRecord.objects.filter(pk=self.call.pk).exists())
+
+		self.assertEqual(
+			self.client.post(
+				reverse('marketing:customer_delete', args=[self.customer.pk])
+			).status_code,
+			302,
+		)
+		self.assertFalse(Customer.objects.filter(pk=self.customer.pk).exists())
+
+	def test_owner_cannot_edit_or_delete_other_users_records(self):
+		self.client.force_login(self.marketer)
+
+		self.assertEqual(
+			self.client.get(
+				reverse('marketing:customer_update', args=[self.other_customer.pk])
+			).status_code,
+			404,
+		)
+		self.assertEqual(
+			self.client.get(
+				reverse('marketing:call_update', args=[self.other_call.pk])
+			).status_code,
+			404,
+		)
+		self.assertEqual(
+			self.client.post(
+				reverse('marketing:customer_delete', args=[self.other_customer.pk])
+			).status_code,
+			404,
+		)
+
 # Create your tests here.

@@ -1,5 +1,5 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, DeleteView, TemplateView, DetailView, View
+from django.views.generic import ListView, CreateView, DeleteView, TemplateView, DetailView, UpdateView, View
 from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -67,6 +67,16 @@ class CustomerCreateView(LoginRequiredMixin, CreateView):
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
+
+class CustomerUpdateView(LoginRequiredMixin, UpdateView):
+    model = Customer
+    template_name = 'marketing/customer_form.html'
+    fields = CustomerCreateView.fields
+    success_url = reverse_lazy('marketing:customer_list')
+
+    def get_queryset(self):
+        return visible_customers(self.request.user)
+
 # --- CALL RECORD PAGES ---
 class CallListView(LoginRequiredMixin, ListView):
     model = CallRecord
@@ -101,6 +111,21 @@ class CallCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
+class CallUpdateView(LoginRequiredMixin, UpdateView):
+    model = CallRecord
+    template_name = 'marketing/call_form.html'
+    fields = CallCreateView.fields
+    success_url = reverse_lazy('marketing:call_list')
+
+    def get_queryset(self):
+        return visible_calls(self.request.user)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['customer'].queryset = visible_customers(self.request.user)
+        return form
+
+
 class CallDeleteView(LoginRequiredMixin, DeleteView):
     model = CallRecord
     template_name = 'marketing/call_confirm_delete.html'
@@ -108,6 +133,15 @@ class CallDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return visible_calls(self.request.user)
+
+
+class CustomerDeleteView(LoginRequiredMixin, DeleteView):
+    model = Customer
+    template_name = 'marketing/customer_confirm_delete.html'
+    success_url = reverse_lazy('marketing:customer_list')
+
+    def get_queryset(self):
+        return visible_customers(self.request.user)
     
 class QuickCustomerCreateView(LoginRequiredMixin, View):
     def post(self, request):

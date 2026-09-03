@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">افزودن مشتری جدید</h1>
+    <h1 class="page-title">{% if object %}ویرایش مشتری{% else %}افزودن مشتری جدید{% endif %}</h1>
 </div>
 
 <div class="card" style="max-width: 600px; margin: 0 auto;">
@@ -75,7 +75,7 @@
         </div>
 
         <div class="form-actions" style="margin-top: 24px;">
-            <button type="submit" class="btn btn-primary">ذخیره مشتری</button>
+            <button type="submit" class="btn btn-primary">{% if object %}ذخیره تغییرات{% else %}ذخیره مشتری{% endif %}</button>
             <a href="{% url 'marketing:customer_list' %}" class="btn btn-secondary">انصراف</a>
         </div>
     </form>

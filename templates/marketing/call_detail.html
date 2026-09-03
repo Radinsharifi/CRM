@@ -1,8 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
-<button class="btn" onclick="history.back()" style="background:none; color:hsl(var(--muted-foreground)); margin-bottom:16px;">
-    ← بازگشت
-</button>
+<div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
+    <button class="btn" onclick="history.back()" style="background:none; color:hsl(var(--muted-foreground));">
+        ← بازگشت
+    </button>
+    <div style="display:flex; gap:8px;">
+        <a href="{% url 'marketing:call_update' object.pk %}" class="btn btn-primary">ویرایش</a>
+        <a href="{% url 'marketing:call_delete' object.pk %}" class="btn" style="background:hsl(var(--destructive)); color:#fff;">حذف</a>
+    </div>
+</div>
 
 <div class="page-header">
     <h1 class="page-title">گزارش جزئیات تماس</h1>

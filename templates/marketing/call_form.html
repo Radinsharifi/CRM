@@ -3,7 +3,7 @@
 <!-- Centered container to ensure it stays away from sidebar edges -->
 <div style="max-width: 700px; margin: 0 auto; width: 100%;">
     <div class="page-header" style="margin-bottom: 24px;">
-        <h1 class="page-title">ثبت رکورد جدید</h1>
+        <h1 class="page-title">{% if object %}ویرایش رکورد تماس{% else %}ثبت رکورد جدید{% endif %}</h1>
     </div>
 
     <div class="card">
@@ -62,7 +62,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">ثبت نهایی اطلاعات</button>
+                <button type="submit" class="btn btn-primary" style="flex: 1; justify-content: center;">{% if object %}ذخیره تغییرات{% else %}ثبت نهایی اطلاعات{% endif %}</button>
                 <a href="{% url 'marketing:call_list' %}" class="btn btn-secondary">انصراف</a>
             </div>
         </form>
