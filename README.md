@@ -12,16 +12,16 @@ The project is currently under active development and serves as a foundation for
 ## Screen Shots
 
 ### Dashboard
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](https://github.com/Radinsharifi/CRM/tree/main/screenshots/dashboard.png)
 
 ### Customer_List
-![Customer_List](screenshots/Customer_list.png)
+![Customer_List](https://github.com/Radinsharifi/CRM/tree/main/screenshots/Customer_list.png)
 
 ### Customer_From
-![Customer_Form](screenshots/Customer_form.png)
+![Customer_Form](https://github.com/Radinsharifi/CRM/tree/main/screenshots/Customer_form.png)
 
 ### Customer_Detail
-![Customer_Detail](screenshots/Customer_detail.png)
+![Customer_Detail](https://github.com/Radinsharifi/CRM/tree/main/screenshots/Customer_detail.png)
 
 
 ## Key Features
