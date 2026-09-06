@@ -1,3 +1,4 @@
+<img width="1920" height="894" alt="Dashboard" src="https://github.com/user-attachments/assets/25a0cac5-f980-4703-923b-2abc30ee3086" />
 # CRM
 
 Customer Relationship Management system built with Django.
