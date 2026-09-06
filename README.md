@@ -8,6 +8,22 @@ This project is a modular CRM application designed to manage customer data, mark
 
 The project is currently under active development and serves as a foundation for a more complete enterprise CRM solution.
 
+
+## Screen Shots
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Customer_List
+![Admin Panel](screenshots/Customer_list.png)
+
+### Customer_From
+![Admin Panel](screenshots/Customer_form.png)
+
+### Customer_Detail
+![Shipment Detail](screenshots/Customer_detail.png)
+
+
 ## Key Features
 
 - Custom user management
