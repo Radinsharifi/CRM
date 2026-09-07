@@ -5,7 +5,7 @@ class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = [
-            'company_name', 'full_name', 'phone_number', 'email',
+            'company_name', 'full_name', 'category', 'phone_number', 'email',
             'field_of_activity', 'job_title', 'landline', 'mobile',
             'website', 'acquisition_source'
         ]
@@ -19,7 +19,7 @@ class CallRecordForm(forms.ModelForm):
     class Meta:
         model = CallRecord
         fields = [
-            'customer', 'result', 'notes', 'follow_up_date'
+            'customer', 'result', 'duration_minutes', 'notes', 'follow_up_date'
         ]
         widgets = {
             'follow_up_date': forms.DateInput(attrs={'type': 'date'}),

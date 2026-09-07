@@ -3,7 +3,7 @@ from django.views.generic import ListView, CreateView, DeleteView, TemplateView,
 from django.utils import timezone
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .models import Customer, CallRecord
+from .models import Category, Customer, CallRecord
 
 def visible_customers(user):
     if user.is_superuser:
@@ -37,7 +37,17 @@ class CustomerListView(LoginRequiredMixin, ListView):
     context_object_name = 'customers'
 
     def get_queryset(self):
-        return visible_customers(self.request.user)
+        customers = visible_customers(self.request.user)
+        category_id = self.request.GET.get('category')
+        if category_id:
+            customers = customers.filter(category_id=category_id)
+        return customers
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['selected_category'] = self.request.GET.get('category', '')
+        return context
 
 class CustomerDetailView(LoginRequiredMixin, DetailView):
     model = Customer
@@ -57,7 +67,7 @@ class CustomerCreateView(LoginRequiredMixin, CreateView):
     model = Customer
     template_name = 'marketing/customer_form.html'
     fields = [
-        'company_name', 'full_name', 'phone_number', 'email',
+        'company_name', 'full_name', 'category', 'phone_number', 'email',
         'field_of_activity', 'job_title', 'landline', 'mobile',
         'website', 'acquisition_source'
     ]
@@ -97,7 +107,7 @@ class CallCreateView(LoginRequiredMixin, CreateView):
     model = CallRecord
     template_name = 'marketing/call_form.html'
     fields = [
-        'customer', 'result', 'notes', 'follow_up_date'
+        'customer', 'result', 'duration_minutes', 'notes', 'follow_up_date'
     ]
     success_url = reverse_lazy('marketing:call_list')
 

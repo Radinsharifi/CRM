@@ -26,6 +26,10 @@
         <h3 class="card-title" style="font-size:16px; margin-bottom:16px;">اطلاعات تماس</h3>
         <div style="display:grid; gap:12px;">
             <div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));">دسته‌بندی</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.category.name|default:"ثبت نشده" }}</div>
+            </div>
+            <div>
                 <div style="font-size:12px; color:hsl(var(--muted-foreground));">تلفن همراه</div>
                 <div style="font-size:14px; font-weight:500;">{{ object.mobile|default:"ثبت نشده" }}</div>
             </div>

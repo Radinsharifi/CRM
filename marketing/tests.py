@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from .models import CallRecord, Customer
+from .models import CallRecord, Category, Customer
 
 
 class OwnershipVisibilityTests(TestCase):
@@ -18,9 +18,11 @@ class OwnershipVisibilityTests(TestCase):
 		self.superuser = user_model.objects.create_superuser(
 			username='admin', password='password', email='admin@example.com'
 		)
+		self.category = Category.objects.create(name='Enterprise')
 		self.customer = Customer.objects.create(
 			full_name='First Contact Full Name',
 			company_name='First Company',
+			category=self.category,
 			phone_number='1111111111',
 			created_by=self.marketer,
 		)
@@ -227,6 +229,45 @@ class OwnershipVisibilityTests(TestCase):
 				reverse('marketing:customer_delete', args=[self.other_customer.pk])
 			).status_code,
 			404,
+		)
+
+	def test_customer_list_can_filter_by_category(self):
+		self.client.force_login(self.marketer)
+
+		response = self.client.get(
+			reverse('marketing:customer_list'),
+			{'category': self.category.pk},
+		)
+
+		self.assertContains(response, 'First Company')
+		self.assertNotContains(response, 'Second Company')
+
+	def test_call_duration_is_required_in_form_and_saved(self):
+		self.client.force_login(self.marketer)
+
+		missing_duration = self.client.post(
+			reverse('marketing:call_create'),
+			{'customer': self.customer.pk, 'result': 'No duration'},
+		)
+		self.assertEqual(missing_duration.status_code, 200)
+		self.assertEqual(CallRecord.objects.count(), 3)
+
+		created = self.client.post(
+			reverse('marketing:call_create'),
+			{
+				'customer': self.customer.pk,
+				'result': 'Timed call',
+				'duration_minutes': 12,
+				'follow_up_date': timezone.localdate().isoformat(),
+			},
+		)
+		self.assertEqual(created.status_code, 302)
+		self.assertTrue(
+			CallRecord.objects.filter(
+				customer=self.customer,
+				result='Timed call',
+				duration_minutes=12,
+			).exists()
 		)
 
 # Create your tests here.

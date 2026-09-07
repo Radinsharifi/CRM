@@ -8,6 +8,20 @@
     <a href="{% url 'marketing:customer_create' %}" class="btn btn-primary">+ افزودن مشتری</a>
 </div>
 
+<form method="get" class="card" style="display:flex;align-items:end;gap:12px;margin-bottom:24px;">
+    <div class="form-group" style="margin:0;min-width:240px;">
+        <label class="form-label" for="category-filter">دسته‌بندی</label>
+        <select name="category" id="category-filter" class="form-select">
+            <option value="">همه دسته‌بندی‌ها</option>
+            {% for category in categories %}
+                <option value="{{ category.pk }}" {% if selected_category == category.pk|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-secondary">فیلتر</button>
+    {% if selected_category %}<a href="{% url 'marketing:customer_list' %}" class="btn btn-secondary">حذف فیلتر</a>{% endif %}
+</form>
+
 <div class="card" style="padding:0;overflow:hidden">
     <div class="table-container">
         <table>
@@ -16,6 +30,7 @@
                     <th>ردیف</th>
                     <th>نام شرکت</th>
                     <th>نام نام خانوادگی</th>
+                    <th>دسته‌بندی</th>
                     <th>رابط</th>
                     <th>شماره تماس</th>
                     <th>ایمیل</th>
@@ -29,6 +44,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td><strong>{{ customer.company_name }}</strong></td>
                     <td>{{ customer.full_name }}</td>
+                    <td>{{ customer.category.name|default:"-" }}</td>
                     <td>{% if customer.created_by %}{{ customer.created_by.get_full_name|default:customer.created_by.username }}{% else %}<span style="color:hsl(var(--muted-foreground)); font-style: italic;">ثبت نشده</span>{% endif %}</td>
                     <td>{{ customer.phone_number }}</td>
                     <td>{{ customer.email|default:"-" }}</td>
@@ -43,7 +59,7 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="8" style="text-align:center;padding:32px">هیچ مشتری یافت نشد.</td></tr>
+                <tr><td colspan="9" style="text-align:center;padding:32px">هیچ مشتری یافت نشد.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
