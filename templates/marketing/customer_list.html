@@ -8,7 +8,11 @@
     <a href="{% url 'marketing:customer_create' %}" class="btn btn-primary">+ افزودن مشتری</a>
 </div>
 
-<form method="get" class="card" style="display:flex;align-items:end;gap:12px;margin-bottom:24px;">
+<form method="get" class="card" style="display:flex;align-items:end;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+    <div class="form-group" style="margin:0;min-width:240px;flex:1;">
+        <label class="form-label" for="company-name-search">جستجوی نام شرکت</label>
+        <input type="search" name="company_name" id="company-name-search" class="form-input" value="{{ company_name_query }}" placeholder="مثلاً شرکت آرمان">
+    </div>
     <div class="form-group" style="margin:0;min-width:240px;">
         <label class="form-label" for="category-filter">دسته‌بندی</label>
         <select name="category" id="category-filter" class="form-select">
@@ -19,7 +23,7 @@
         </select>
     </div>
     <button type="submit" class="btn btn-secondary">فیلتر</button>
-    {% if selected_category %}<a href="{% url 'marketing:customer_list' %}" class="btn btn-secondary">حذف فیلتر</a>{% endif %}
+    {% if selected_category or company_name_query %}<a href="{% url 'marketing:customer_list' %}" class="btn btn-secondary">حذف فیلتر</a>{% endif %}
 </form>
 
 <div class="card" style="padding:0;overflow:hidden">
@@ -35,7 +39,6 @@
                     <th>شماره تماس</th>
                     <th>ایمیل</th>
                     <th>تاریخ ثبت</th>
-                    <th>حذف</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,20 +52,13 @@
                     <td>{{ customer.phone_number }}</td>
                     <td>{{ customer.email|default:"-" }}</td>
                     <td>{{ customer.created_at|date:"Y/m/d" }}</td>
-                    <td style="text-align: center;">
-                        <form action="{% url 'marketing:customer_delete' customer.id %}" method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" onclick="event.stopPropagation(); return confirm('آیا از حذف این مشتری مطمئن هستید؟');" style="background:none; border:none; color:hsl(var(--destructive)); cursor:pointer;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            </button>
-                        </form>
-                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="9" style="text-align:center;padding:32px">هیچ مشتری یافت نشد.</td></tr>
+                <tr><td colspan="8" style="text-align:center;padding:32px">هیچ مشتری یافت نشد.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+{% if is_paginated %}<div class="pagination"><span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_previous %}<a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}{% if company_name_query %}&company_name={{ company_name_query|urlencode }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">قبلی</a>{% endif %}{% if page_obj.has_next %}<a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}{% if company_name_query %}&company_name={{ company_name_query|urlencode }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">بعدی</a>{% endif %}</div>{% endif %}
 {% endblock %}

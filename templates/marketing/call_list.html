@@ -2,11 +2,35 @@
 {% block content %}
 <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
     <div>
-        <h1 class="page-title">تاریخچه تماس‌ها</h1>
+        <h1 class="page-title">رکوردهای تماس</h1>
         <p class="page-desc">گزارشات ثبت شده توسط تیم بازاریابی</p>
     </div>
-    <a href="{% url 'marketing:call_create' %}" class="btn btn-primary">+ ثبت رکورد جدید</a>
+    <div style="display:flex;gap:8px;align-items:center;">
+        <a href="{% url 'marketing:calls_hub' %}" class="btn btn-secondary">همه پیگیری‌ها</a>
+        <a href="{% url 'marketing:call_create' %}" class="btn btn-primary">+ ثبت رکورد جدید</a>
+    </div>
 </div>
+
+<form method="get" class="call-filter-bar">
+    <label class="filter-switch">
+        <input type="checkbox" name="today" value="1" {% if today_only %}checked{% endif %} onchange="this.form.submit()">
+        <span class="filter-switch-track"><span class="filter-switch-thumb"></span></span>
+        <span class="filter-switch-label">فقط تماس‌های امروز</span>
+    </label>
+</form>
+<style>
+    .call-filter-bar { display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px;padding:10px 14px;background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:999px;box-shadow:0 2px 8px hsl(var(--foreground)/.04); }
+    .filter-switch { display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:600; }
+    .filter-switch input { position:absolute;opacity:0;pointer-events:none; }
+    .filter-switch-track { width:42px;height:24px;display:inline-block;border-radius:999px;background:hsl(var(--secondary));border:1px solid hsl(var(--border));position:relative;transition:.2s; }
+    .filter-switch-thumb { position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:hsl(var(--muted-foreground));transition:.2s; }
+    .filter-switch input:checked + .filter-switch-track { background:hsl(var(--primary));border-color:hsl(var(--primary)); }
+    .filter-switch input:checked + .filter-switch-track .filter-switch-thumb { right:21px;background:#fff; }
+    .filter-switch-label { white-space:nowrap; }
+    .filter-description { flex:1;font-size:12px;color:hsl(var(--muted-foreground)); }
+    .filter-clear { padding:7px 12px; }
+    @media (max-width:600px) { .call-filter-bar { align-items:flex-start;flex-wrap:wrap;border-radius:var(--radius); } .filter-description { flex-basis:100%;order:3; } }
+</style>
 
 <div class="card" style="padding:0;overflow:hidden">
     <div class="table-container">
@@ -16,9 +40,9 @@
                     <th>ردیف</th>
                     <th>نام شرکت</th>
                     <th>نتیجه تماس</th>
+                    <th>مدت تماس</th>
                     <th>بازاریاب(ثبت کننده)</th>
                     <th>تاریخ ثبت</th>
-                    <th>حذف</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,6 +51,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ call.customer.company_name }}</td>
                     <td><span class="badge">{{ call.result }}</span></td>
+                    <td>{{ call.duration_minutes|default:0 }} دقیقه و {{ call.duration_seconds|default:0 }} ثانیه</td>
                     <td>
                         {% if call.created_by %}
                             {{ call.created_by.get_full_name|default:call.created_by.username }}
@@ -35,20 +60,13 @@
                         {% endif %}
                     </td>
                     <td>{{ call.created_at|date:"Y/m/d" }}</td>
-                    <td style="text-align: center;">
-                        <form action="{% url 'marketing:call_delete' call.id %}" method="POST" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" onclick="event.stopPropagation(); return confirm('آیا از حذف این رکورد مطمئن هستید؟');" style="background:none; border:none; color:hsl(var(--destructive)); cursor:pointer;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            </button>
-                        </form>
-                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="7" style="text-align:center;padding:32px">رکوردی ثبت نشده است.</td></tr>
+                <tr><td colspan="6" style="text-align:center;padding:32px">رکوردی ثبت نشده است.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+{% if is_paginated %}<div class="pagination"><span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_previous %}<a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}{% if today_only %}&today=1{% endif %}">قبلی</a>{% endif %}{% if page_obj.has_next %}<a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}{% if today_only %}&today=1{% endif %}">بعدی</a>{% endif %}</div>{% endif %}
 {% endblock %}

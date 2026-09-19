@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+	.average-toggle { display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;cursor:pointer; }
+	.average-toggle input { position:absolute;opacity:0;pointer-events:none; }
+	.average-toggle-track { width:38px;height:22px;border-radius:999px;background:hsl(var(--secondary));border:1px solid hsl(var(--border));position:relative;transition:.2s; }
+	.average-toggle-track span { position:absolute;top:3px;right:3px;width:14px;height:14px;border-radius:50%;background:hsl(var(--muted-foreground));transition:.2s; }
+	.average-toggle input:checked + .average-toggle-track { background:hsl(var(--primary));border-color:hsl(var(--primary)); }
+	.average-toggle input:checked + .average-toggle-track span { right:19px;background:#fff; }
+	.customer-follow-up-select { width:100%;min-height:120px;padding:8px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--card));color:hsl(var(--foreground));font:inherit;line-height:1.8; }
+	.customer-follow-up-select:focus { outline:none;border-color:hsl(var(--primary));box-shadow:0 0 0 3px hsl(var(--primary)/.14); }
+	.customer-follow-up-select option { padding:7px 10px;border-radius:6px; }
+	.customer-follow-up-select option:checked { background:hsl(var(--primary));color:#fff; }
+	.follow-up-help { display:block;margin-top:5px;font-size:11px;color:hsl(var(--muted-foreground)); }
+	@media (max-width:600px) { .customer-follow-up-select { min-height:100px; } }
+</style>
+<div style="max-width:700px;margin:0 auto;"><div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><h1 class="page-title">{% if object %}ویرایش کار فردا{% else %}ثبت کار فردا{% endif %}</h1><a href="{% url 'marketing:calls_hub' %}" class="btn btn-secondary">همه پیگیری‌ها</a></div><div class="card"><form method="post">{% csrf_token %}{% if form.errors %}<div class="form-error" style="margin-bottom:16px;">لطفا خطاهای فرم را اصلاح کنید.</div>{% endif %}
+<div class="form-group"><label class="form-label" style="display:flex;justify-content:space-between;align-items:center;"><span>{{ form.new_customer_follow_ups.label }}</span><button type="button" onclick="openCustomerModal()" style="background:none;border:0;color:hsl(var(--primary));font-size:11px;font-weight:700;cursor:pointer;">+ افزودن سریع مشتری</button></label>{{ form.new_customer_follow_ups }}<span class="follow-up-help">برای انتخاب چند مشتری، کلید Ctrl را نگه دارید و انتخاب کنید.</span><div class="form-error">{{ form.new_customer_follow_ups.errors.0 }}</div></div>
+<div class="form-group"><label class="form-label">{{ form.existing_customer_follow_ups.label }}</label>{{ form.existing_customer_follow_ups }}<span class="follow-up-help">برای انتخاب چند مشتری، کلید Ctrl را نگه دارید و انتخاب کنید.</span><div class="form-error">{{ form.existing_customer_follow_ups.errors.0 }}</div></div>
+<div class="form-group"><label class="form-label">{{ form.rate_inquiry_follow_ups.label }}</label>{{ form.rate_inquiry_follow_ups }}<div class="form-error">{{ form.rate_inquiry_follow_ups.errors.0 }}</div></div>
+<div class="form-group"><label class="form-label">{{ form.bill_of_lading_follow_ups.label }}</label>{{ form.bill_of_lading_follow_ups }}<div class="form-error">{{ form.bill_of_lading_follow_ups.errors.0 }}</div></div>
+<label class="average-toggle"><span>{{ form.is_completed.label }}</span>{{ form.is_completed }}<span class="average-toggle-track"><span></span></span></label>
+<div class="form-actions"><button type="submit" class="btn btn-primary">ذخیره کار</button><a href="{% url 'marketing:tomorrow_task_list' %}" class="btn btn-secondary">انصراف</a></div></form></div></div>
+<script>const taskCustomerId = new URLSearchParams(window.location.search).get('customer_id'); if (taskCustomerId) document.querySelectorAll('input[name="new_customer_follow_ups"], input[name="existing_customer_follow_ups"]').forEach(input => { if (input.value === taskCustomerId) input.checked = true; });</script>
+{% endblock %}

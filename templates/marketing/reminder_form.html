@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width:700px;margin:0 auto;"><div class="page-header"><h1 class="page-title">{% if object %}ویرایش یادآوری{% else %}ثبت یادآوری تماس{% endif %}</h1></div><div class="card"><form method="post">{% csrf_token %}{% if form.errors %}<div class="form-error" style="margin-bottom:16px;">لطفا خطاهای فرم را اصلاح کنید.</div>{% endif %}
+<div class="form-group"><label class="form-label" style="display:flex;justify-content:space-between;align-items:center;"><span>{{ form.customer.label }} *</span><button type="button" onclick="openCustomerModal()" style="background:none;border:0;color:hsl(var(--primary));font-size:11px;font-weight:700;cursor:pointer;">+ افزودن سریع مشتری</button></label>{{ form.customer }}<div class="form-error">{{ form.customer.errors.0 }}</div></div>
+<div class="form-group"><label class="form-label">{{ form.subject.label }} *</label>{{ form.subject }}<div class="form-error">{{ form.subject.errors.0 }}</div></div>
+<div class="grid grid-2"><div class="form-group"><label class="form-label">{{ form.follow_up_date.label }} *</label>{{ form.follow_up_date }}<div class="form-error">{{ form.follow_up_date.errors.0 }}</div></div><div class="form-group"><label class="form-label">{{ form.follow_up_time.label }} *</label>{{ form.follow_up_time }}<div class="form-error">{{ form.follow_up_time.errors.0 }}</div></div></div>
+<div class="form-group"><label class="form-label">{{ form.priority.label }}</label>{{ form.priority }}<div class="form-error">{{ form.priority.errors.0 }}</div></div>
+<div class="form-actions"><button type="submit" class="btn btn-primary">ذخیره یادآوری</button><a href="{% url 'marketing:reminder_list' %}" class="btn btn-secondary">انصراف</a></div></form></div></div>
+<script>const reminderCustomerId = new URLSearchParams(window.location.search).get('customer_id'); if (reminderCustomerId) document.getElementById('id_customer').value = reminderCustomerId;</script>
+{% endblock %}

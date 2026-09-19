@@ -48,7 +48,7 @@
             </div>
             <div>
                 <div style="font-size:12px; color:hsl(var(--muted-foreground));">مدت زمان مکالمه</div>
-                <div style="font-size:14px; font-weight:500;">{{ object.duration_minutes }} دقیقه</div>
+                <div style="font-size:14px; font-weight:500;">{{ object.duration_minutes|default:0 }} دقیقه و {{ object.duration_seconds|default:0 }} ثانیه</div>
             </div>
             <div>
                 <div style="font-size:12px; color:hsl(var(--muted-foreground));">تاریخ پیگیری</div>

@@ -50,17 +50,29 @@
         <p class="page-desc">خوش آمدید! این نمای کلی کسب‌وکار شماست.</p>
     </div>
 
-    <!-- STATS GRID: Removed Income and Followups as requested -->
     <div class="grid grid-4" style="margin-bottom:24px">
-        <!-- مشتریان فعال -->
+
+        <!-- یادآوری‌ها -->
         <div class="card stat-card">
             <div>
-                <div class="stat-title">مشتریان فعال</div>
-                <div class="stat-value">{{ total_customers }}</div>
-                <div class="stat-change up">↑ <span class="label">تعداد کل دیتابیس</span></div>
+                <div class="stat-title">یادآوری‌های تماس</div>
+                <div class="stat-value">{{ reminders_count }}</div>
+                <div class="stat-change up">↑ <span class="label">کل یادآوری‌ها</span></div>
             </div>
             <div class="stat-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>
+            </div>
+        </div>
+
+        <!-- کارهای فردا -->
+        <div class="card stat-card">
+            <div>
+                <div class="stat-title">کارهای باز فردا</div>
+                <div class="stat-value">{{ open_tomorrow_tasks_count }}</div>
+                <div class="stat-change up">↑ <span class="label">در انتظار انجام</span></div>
+            </div>
+            <div class="stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
             </div>
         </div>
 
@@ -100,23 +112,24 @@
         </div>
     </div>
 
-    <!-- RECENT ACTIVITY: Exactly like the mockup -->
     <div class="card">
         <div class="card-header">
             <div class="card-title" style="font-size:16px">فعالیت‌های اخیر</div>
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
-            {% for call in recent_calls %}
-            <div class="activity-item">
+            {% for activity in recent_activities %}
+            <a class="activity-item" href="{{ activity.url }}" style="text-decoration:none;color:inherit;">
                 <div class="activity-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+                    {% if activity.icon == 'call' %}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    {% elif activity.icon == 'reminder' %}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                    {% else %}<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>{% endif %}
                 </div>
                 <div class="activity-body">
-                    <div class="title">ثبت تماس با <strong>{{ call.customer.company_name }}</strong></div>
-                    <div class="desc">نتیجه: {{ call.result }}</div>
+                    <div class="title">{{ activity.title }} <strong>{{ activity.customer }}</strong></div>
+                    <div class="desc">{{ activity.description }}</div>
                 </div>
-                <div class="activity-time">{{ call.created_at|date:"H:i" }}</div>
-            </div>
+                <div class="activity-time">{{ activity.created_by }}<br>{{ activity.created_at|date:"H:i" }}</div>
+            </a>
             {% empty %}
             <p style="text-align:center; color:hsl(var(--muted-foreground)); padding:24px;">فعالیتی یافت نشد.</p>
             {% endfor %}
