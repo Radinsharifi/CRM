@@ -28,7 +28,6 @@ class CallRecordForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            # Apply Select class to dropdowns, Input class to others
             if isinstance(field.widget, forms.Select):
                 field.widget.attrs.update({'class': 'form-select'})
             else:
@@ -47,7 +46,12 @@ class CallReminderForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-select' if isinstance(field.widget, forms.Select) else 'form-input'})
+            if field_name == 'customer':
+                field.widget.attrs.update({'class': 'form-select'})
+            elif isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})
+            else:
+                field.widget.attrs.update({'class': 'form-input'})
 
 
 class TomorrowTaskForm(forms.ModelForm):
@@ -67,4 +71,9 @@ class TomorrowTaskForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-select' if isinstance(field.widget, forms.Select) else 'form-input'})
+            if field_name in ['new_customer_follow_ups', 'existing_customer_follow_ups']:
+                field.widget.attrs.update({'class': 'customer-follow-up-select'})
+            elif isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})
+            else:
+                field.widget.attrs.update({'class': 'form-input'})

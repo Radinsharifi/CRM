@@ -1,6 +1,52 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;"><a href="{% url 'marketing:reminder_list' %}" class="btn btn-secondary">بازگشت به یادآوری‌ها</a><div style="display:flex;gap:8px;"><a href="{% url 'marketing:reminder_update' object.pk %}" class="btn btn-primary">ویرایش</a><a href="{% url 'marketing:reminder_delete' object.pk %}" class="btn" style="background:hsl(var(--destructive));color:#fff;">حذف</a></div></div>
-<div class="page-header"><h1 class="page-title">جزئیات یادآوری تماس</h1><p class="page-desc">{{ object.subject }}</p></div>
-<div class="grid grid-2"><div class="card"><h3 class="card-title" style="font-size:16px;margin-bottom:16px;">مشتری</h3><div class="info-grid"><div class="info-item"><div class="info-label">نام شرکت</div><div class="info-value">{{ object.customer.company_name }}</div></div><div class="info-item"><div class="info-label">نام مشتری</div><div class="info-value">{{ object.customer.full_name }}</div></div></div></div><div class="card"><h3 class="card-title" style="font-size:16px;margin-bottom:16px;">زمان‌بندی</h3><div class="info-grid"><div class="info-item"><div class="info-label">تاریخ</div><div class="info-value">{{ object.follow_up_date|date:'Y/m/d' }}</div></div><div class="info-item"><div class="info-label">ساعت</div><div class="info-value">{{ object.follow_up_time|time:'H:i' }}</div></div><div class="info-item"><div class="info-label">اولویت</div><div class="info-value">{{ object.get_priority_display }}</div></div></div></div></div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+	<a href="{% url 'marketing:reminder_list' %}" class="btn btn-secondary">
+		بازگشت به یادآوری‌ها
+	</a>
+	<div style="display:flex;gap:8px;">
+		<a href="{% url 'marketing:reminder_update' object.pk %}" class="btn btn-primary">ویرایش</a>
+		<a href="{% url 'marketing:reminder_delete' object.pk %}" class="btn" style="background:hsl(var(--destructive));color:#fff;">حذف</a>
+	</div>
+</div>
+
+<div class="page-header">
+	<h1 class="page-title">جزئیات یادآوری تماس</h1>
+	<p class="page-desc">{{ object.subject }}</p>
+</div>
+
+<div class="grid grid-2">
+	<div class="card">
+		<h3 class="card-title" style="font-size:16px;margin-bottom:16px;">مشتری</h3>
+		<div class="info-grid">
+			<div class="info-item">
+				<div class="info-label">نام شرکت</div>
+				<div class="info-value">{{ object.customer.company_name }}</div>
+			</div>
+			<div class="info-item">
+				<div class="info-label">نام مشتری</div>
+				<div class="info-value">{{ object.customer.full_name }}</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card">
+		<h3 class="card-title" style="font-size:16px;margin-bottom:16px;">زمان‌بندی</h3>
+		<div class="info-grid">
+			<div class="info-item">
+				<div class="info-label">تاریخ</div>
+				<div class="info-value">{{ object.follow_up_date|date:'Y/m/d' }}</div>
+			</div>
+			<div class="info-item">
+				<div class="info-label">ساعت</div>
+				<div class="info-value">{{ object.follow_up_time|time:'H:i' }}</div>
+			</div>
+			<div class="info-item">
+				<div class="info-label">اولویت</div>
+				<div class="info-value">{{ object.get_priority_display }}</div>
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock %}

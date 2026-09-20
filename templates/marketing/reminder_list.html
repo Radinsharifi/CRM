@@ -1,8 +1,68 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><div><h1 class="page-title">یادآوری تماس</h1><p class="page-desc">برنامه‌ریزی پیگیری‌های زمان‌دار مشتریان</p></div><div style="display:flex;gap:8px;align-items:center;"><a href="{% url 'marketing:calls_hub' %}" class="btn btn-secondary">همه پیگیری‌ها</a><a href="{% url 'marketing:reminder_create' %}" class="btn btn-primary">+ یادآوری جدید</a></div></div>
-<div class="card" style="padding:0;overflow:hidden;"><div class="table-container"><table><thead><tr><th>ردیف</th><th>نام مشتری</th><th>موضوع پیگیری</th><th>تاریخ</th><th>ساعت</th><th>اولویت</th></tr></thead><tbody>
-{% for reminder in reminders %}<tr class="clickable-row" data-href="{% url 'marketing:reminder_detail' reminder.pk %}"><td>{{ forloop.counter }}</td><td><strong>{{ reminder.customer.company_name }}</strong><br><small>{{ reminder.customer.full_name }}</small></td><td>{{ reminder.subject }}</td><td>{{ reminder.follow_up_date|date:'Y/m/d' }}</td><td>{{ reminder.follow_up_time|time:'H:i' }}</td><td><span class="badge {% if reminder.priority == 'high' %}badge-destructive{% elif reminder.priority == 'low' %}badge-secondary{% else %}badge-warning{% endif %}">{{ reminder.get_priority_display }}</span></td></tr>{% empty %}<tr><td colspan="6" style="text-align:center;padding:32px;">یادآوری‌ای ثبت نشده است.</td></tr>{% endfor %}
-</tbody></table></div></div>
-{% if is_paginated %}<div class="pagination"><span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_previous %}<a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}{% if page_obj.has_next %}<a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}</div>{% endif %}
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+	<div>
+		<h1 class="page-title">یادآوری تماس</h1>
+		<p class="page-desc">برنامه‌ریزی پیگیری‌های زمان‌دار مشتریان</p>
+	</div>
+	<div style="display:flex;gap:8px;align-items:center;">
+		<a href="{% url 'marketing:calls_hub' %}" class="btn btn-secondary">همه پیگیری‌ها</a>
+		<a href="{% url 'marketing:reminder_create' %}" class="btn btn-primary">+ یادآوری جدید</a>
+	</div>
+</div>
+
+<div class="card" style="padding:0;overflow:hidden;">
+	<div class="table-container">
+		<table>
+			<thead>
+				<tr>
+					<th>ردیف</th>
+					<th>نام مشتری</th>
+					<th>موضوع پیگیری</th>
+					<th>تاریخ</th>
+					<th>ساعت</th>
+					<th>اولویت</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for reminder in reminders %}
+				<tr class="clickable-row" data-href="{% url 'marketing:reminder_detail' reminder.pk %}">
+					<td>{{ forloop.counter }}</td>
+					<td>
+						<strong>{{ reminder.customer.company_name }}</strong><br>
+						<small>{{ reminder.customer.full_name }}</small>
+					</td>
+					<td>{{ reminder.subject }}</td>
+					<td>{{ reminder.follow_up_date|date:'Y/m/d' }}</td>
+					<td>{{ reminder.follow_up_time|time:'H:i' }}</td>
+					<td>
+						<span class="badge {% if reminder.priority == 'high' %}badge-destructive{% elif reminder.priority == 'low' %}badge-secondary{% else %}badge-warning{% endif %}">
+							{{ reminder.get_priority_display }}
+						</span>
+					</td>
+				</tr>
+				{% empty %}
+				<tr>
+					<td colspan="6" style="text-align:center;padding:32px;">
+						یادآوری‌ای ثبت نشده است.
+					</td>
+				</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+	<span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span>
+	{% if page_obj.has_previous %}
+	<a class="btn btn-secondary" href="?page={{ page_obj.previous_page_number }}">قبلی</a>
+	{% endif %}
+	{% if page_obj.has_next %}
+	<a class="btn btn-secondary" href="?page={{ page_obj.next_page_number }}">بعدی</a>
+	{% endif %}
+</div>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,14 @@
+<div class="customer-combobox" data-customer-combobox>
+    {{ field }}
+    <div class="customer-combobox-control" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="{{ field.id_for_label }}Options">
+        <input type="text" class="form-input customer-combobox-input" autocomplete="off" placeholder="جستجوی مشتری..." aria-autocomplete="list" aria-controls="{{ field.id_for_label }}Options">
+        <button type="button" class="customer-combobox-arrow" aria-label="نمایش مشتری‌ها">⌄</button>
+    </div>
+    <div class="customer-combobox-menu" id="{{ field.id_for_label }}Options" role="listbox" hidden>
+        <div class="customer-combobox-search">
+            <input type="text" autocomplete="off" placeholder="جستجو...">
+        </div>
+        <div class="customer-combobox-list"></div>
+        <div class="customer-combobox-empty" hidden>مشتری پیدا نشد.</div>
+    </div>
+</div>

@@ -1,25 +1,457 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-	.average-toggle { display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;cursor:pointer; }
-	.average-toggle input { position:absolute;opacity:0;pointer-events:none; }
-	.average-toggle-track { width:38px;height:22px;border-radius:999px;background:hsl(var(--secondary));border:1px solid hsl(var(--border));position:relative;transition:.2s; }
-	.average-toggle-track span { position:absolute;top:3px;right:3px;width:14px;height:14px;border-radius:50%;background:hsl(var(--muted-foreground));transition:.2s; }
-	.average-toggle input:checked + .average-toggle-track { background:hsl(var(--primary));border-color:hsl(var(--primary)); }
-	.average-toggle input:checked + .average-toggle-track span { right:19px;background:#fff; }
-	.customer-follow-up-select { width:100%;min-height:120px;padding:8px;border:1px solid hsl(var(--border));border-radius:var(--radius);background:hsl(var(--card));color:hsl(var(--foreground));font:inherit;line-height:1.8; }
-	.customer-follow-up-select:focus { outline:none;border-color:hsl(var(--primary));box-shadow:0 0 0 3px hsl(var(--primary)/.14); }
-	.customer-follow-up-select option { padding:7px 10px;border-radius:6px; }
-	.customer-follow-up-select option:checked { background:hsl(var(--primary));color:#fff; }
-	.follow-up-help { display:block;margin-top:5px;font-size:11px;color:hsl(var(--muted-foreground)); }
-	@media (max-width:600px) { .customer-follow-up-select { min-height:100px; } }
+	.tomorrow-task-form-page {
+		max-width: 700px;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.tomorrow-task-form-page .page-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.form-error-summary {
+		margin-bottom: 16px;
+	}
+
+	.customer-field-label {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.customer-field-label button {
+		border: 0;
+		background: none;
+		color: hsl(var(--primary));
+		font-size: 11px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.average-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		font-size: 13px;
+		font-weight: 600;
+		cursor: pointer;
+	}
+
+	.average-toggle input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.average-toggle-track {
+		width: 38px;
+		height: 22px;
+		border-radius: 999px;
+		background: hsl(var(--secondary));
+		border: 1px solid hsl(var(--border));
+		position: relative;
+		transition: .2s;
+	}
+
+	.average-toggle-track span {
+		position: absolute;
+		top: 3px;
+		right: 3px;
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background: hsl(var(--muted-foreground));
+		transition: .2s;
+	}
+
+	.average-toggle input:checked + .average-toggle-track {
+		background: hsl(var(--primary));
+		border-color: hsl(var(--primary));
+	}
+
+	.average-toggle input:checked + .average-toggle-track span {
+		right: 19px;
+		background: #fff;
+	}
+
+	.customer-follow-up-select {
+		width: 100%;
+		min-height: 120px;
+		padding: 8px;
+		border: 1px solid hsl(var(--border));
+		border-radius: var(--radius);
+		background: hsl(var(--card));
+		color: hsl(var(--foreground));
+		font: inherit;
+		line-height: 1.8;
+	}
+
+	.customer-follow-up-select:focus {
+		outline: none;
+		border-color: hsl(var(--primary));
+		box-shadow: 0 0 0 3px hsl(var(--primary) / .14);
+	}
+
+	.customer-follow-up-select option {
+		padding: 7px 10px;
+		border-radius: 6px;
+	}
+
+	.customer-follow-up-select option:checked {
+		background: hsl(var(--primary));
+		color: #fff;
+	}
+
+	.follow-up-help {
+		display: block;
+		margin-top: 5px;
+		font-size: 11px;
+		color: hsl(var(--muted-foreground));
+	}
+
+	/* Searchable multi-select customer combobox */
+	.customer-multi-combobox {
+		position: relative;
+		width: 100%;
+	}
+	.customer-multi-combobox > select {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+		pointer-events: none;
+	}
+	.customer-multi-control {
+		position:relative;min-height:44px;box-sizing:border-box;
+		display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+		padding:5px 42px 5px 8px;
+		border:1px solid hsl(var(--border));border-radius:var(--radius);
+		background:hsl(var(--card));color:hsl(var(--foreground));cursor:text;
+	}
+	.customer-multi-control:focus-within {
+		outline:none;border-color:hsl(var(--primary));
+		box-shadow:0 0 0 3px hsl(var(--primary)/.14);
+	}
+	.customer-multi-input {
+		flex:1;min-width:120px;height:32px;border:0;outline:0;
+		background:transparent;color:inherit;font:inherit;padding:0 4px;
+	}
+	.customer-multi-input::placeholder { color:hsl(var(--muted-foreground)); }
+	.customer-multi-arrow {
+		position:absolute;left:8px;top:50%;transform:translateY(-50%);
+		width:28px;height:30px;border:0;background:transparent;
+		color:hsl(var(--muted-foreground));cursor:pointer;font-size:20px;
+	}
+	.customer-multi-chip {
+		display:inline-flex;align-items:center;gap:5px;
+		max-width:100%;padding:4px 8px;border-radius:999px;
+		background:hsl(var(--primary));color:#fff;font-size:12px;line-height:1.5;
+	}
+	.customer-multi-chip button {
+		width:18px;height:18px;padding:0;border:0;border-radius:50%;
+		background:rgba(255,255,255,.22);color:#fff;cursor:pointer;
+		font-size:14px;line-height:16px;
+	}
+	.customer-multi-menu {
+		position:absolute;z-index:1000;top:calc(100% + 4px);right:0;left:0;
+		background:hsl(var(--card));border:1px solid hsl(var(--border));
+		border-radius:7px;box-shadow:0 8px 22px rgba(0,0,0,.12);overflow:hidden;
+	}
+	.customer-multi-search { padding:8px;border-bottom:1px solid hsl(var(--border)); }
+	.customer-multi-search input {
+		box-sizing:border-box;width:100%;height:40px;padding:7px 10px;
+		border:1px solid hsl(var(--border));border-radius:6px;
+		background:hsl(var(--card));color:hsl(var(--foreground));font:inherit;outline:none;
+	}
+	.customer-multi-search input:focus { border-color:hsl(var(--primary)); }
+	.customer-multi-list { max-height:280px;overflow-y:auto; }
+	.customer-multi-option {
+		display:flex;align-items:center;gap:9px;padding:10px 12px;
+		cursor:pointer;font-size:14px;line-height:1.5;text-align:right;
+	}
+	.customer-multi-option:hover,.customer-multi-option.is-highlighted {
+		background:hsl(var(--secondary));
+	}
+	.customer-multi-option input { width:16px;height:16px;accent-color:hsl(var(--primary));pointer-events:none; }
+	.customer-multi-empty { padding:14px;color:hsl(var(--muted-foreground));text-align:center; }
+	@media (max-width:600px) {
+		.customer-multi-list { max-height:240px; }
+	}
 </style>
-<div style="max-width:700px;margin:0 auto;"><div class="page-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><h1 class="page-title">{% if object %}ویرایش کار فردا{% else %}ثبت کار فردا{% endif %}</h1><a href="{% url 'marketing:calls_hub' %}" class="btn btn-secondary">همه پیگیری‌ها</a></div><div class="card"><form method="post">{% csrf_token %}{% if form.errors %}<div class="form-error" style="margin-bottom:16px;">لطفا خطاهای فرم را اصلاح کنید.</div>{% endif %}
-<div class="form-group"><label class="form-label" style="display:flex;justify-content:space-between;align-items:center;"><span>{{ form.new_customer_follow_ups.label }}</span><button type="button" onclick="openCustomerModal()" style="background:none;border:0;color:hsl(var(--primary));font-size:11px;font-weight:700;cursor:pointer;">+ افزودن سریع مشتری</button></label>{{ form.new_customer_follow_ups }}<span class="follow-up-help">برای انتخاب چند مشتری، کلید Ctrl را نگه دارید و انتخاب کنید.</span><div class="form-error">{{ form.new_customer_follow_ups.errors.0 }}</div></div>
-<div class="form-group"><label class="form-label">{{ form.existing_customer_follow_ups.label }}</label>{{ form.existing_customer_follow_ups }}<span class="follow-up-help">برای انتخاب چند مشتری، کلید Ctrl را نگه دارید و انتخاب کنید.</span><div class="form-error">{{ form.existing_customer_follow_ups.errors.0 }}</div></div>
-<div class="form-group"><label class="form-label">{{ form.rate_inquiry_follow_ups.label }}</label>{{ form.rate_inquiry_follow_ups }}<div class="form-error">{{ form.rate_inquiry_follow_ups.errors.0 }}</div></div>
-<div class="form-group"><label class="form-label">{{ form.bill_of_lading_follow_ups.label }}</label>{{ form.bill_of_lading_follow_ups }}<div class="form-error">{{ form.bill_of_lading_follow_ups.errors.0 }}</div></div>
-<label class="average-toggle"><span>{{ form.is_completed.label }}</span>{{ form.is_completed }}<span class="average-toggle-track"><span></span></span></label>
-<div class="form-actions"><button type="submit" class="btn btn-primary">ذخیره کار</button><a href="{% url 'marketing:tomorrow_task_list' %}" class="btn btn-secondary">انصراف</a></div></form></div></div>
-<script>const taskCustomerId = new URLSearchParams(window.location.search).get('customer_id'); if (taskCustomerId) document.querySelectorAll('input[name="new_customer_follow_ups"], input[name="existing_customer_follow_ups"]').forEach(input => { if (input.value === taskCustomerId) input.checked = true; });</script>
+
+<div class="tomorrow-task-form-page">
+	<div class="page-header">
+		<h1 class="page-title">
+			{% if object %}ویرایش کار فردا{% else %}ثبت کار فردا{% endif %}
+		</h1>
+		<a href="{% url 'marketing:calls_hub' %}" class="btn btn-secondary">
+			همه پیگیری‌ها
+		</a>
+	</div>
+
+	<div class="card">
+		<form method="post">
+			{% csrf_token %}
+			{% if form.errors %}
+			<div class="form-error" style="margin-bottom:16px;">لطفا خطاهای فرم را اصلاح کنید.</div>
+			{% endif %}
+
+			<div class="form-group">
+				<label class="form-label" style="display:flex;justify-content:space-between;align-items:center;">
+					<span>{{ form.new_customer_follow_ups.label }}</span>
+					<button type="button" onclick="openCustomerModal()" style="background:none;border:0;color:hsl(var(--primary));font-size:11px;font-weight:700;cursor:pointer;">+ افزودن سریع مشتری</button>
+				</label>
+
+				<div class="customer-multi-combobox" data-select-id="id_new_customer_follow_ups">
+					{{ form.new_customer_follow_ups }}
+					<div class="customer-multi-control" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+						<div class="customer-multi-chips"></div>
+						<input type="text" class="customer-multi-input" autocomplete="off" placeholder="جستجوی مشتری...">
+						<button type="button" class="customer-multi-arrow" aria-label="نمایش مشتری‌ها">⌄</button>
+					</div>
+					<div class="customer-multi-menu" role="listbox" hidden>
+						<div class="customer-multi-search">
+							<input type="text" class="customer-multi-filter" autocomplete="off" placeholder="جستجو...">
+						</div>
+						<div class="customer-multi-list"></div>
+						<div class="customer-multi-empty" hidden>مشتری پیدا نشد.</div>
+					</div>
+				</div>
+
+				<span class="follow-up-help">برای انتخاب چند مشتری، از فهرست بازشونده چند مشتری را انتخاب کنید.</span>
+				<div class="form-error">{{ form.new_customer_follow_ups.errors.0 }}</div>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">{{ form.existing_customer_follow_ups.label }}</label>
+
+				<div class="customer-multi-combobox" data-select-id="id_existing_customer_follow_ups">
+					{{ form.existing_customer_follow_ups }}
+					<div class="customer-multi-control" role="combobox" aria-haspopup="listbox" aria-expanded="false">
+						<div class="customer-multi-chips"></div>
+						<input type="text" class="customer-multi-input" autocomplete="off" placeholder="جستجوی مشتری...">
+						<button type="button" class="customer-multi-arrow" aria-label="نمایش مشتری‌ها">⌄</button>
+					</div>
+					<div class="customer-multi-menu" role="listbox" hidden>
+						<div class="customer-multi-search">
+							<input type="text" class="customer-multi-filter" autocomplete="off" placeholder="جستجو...">
+						</div>
+						<div class="customer-multi-list"></div>
+						<div class="customer-multi-empty" hidden>مشتری پیدا نشد.</div>
+					</div>
+				</div>
+
+				<span class="follow-up-help">برای انتخاب چند مشتری، از فهرست بازشونده چند مشتری را انتخاب کنید.</span>
+				<div class="form-error">{{ form.existing_customer_follow_ups.errors.0 }}</div>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">{{ form.rate_inquiry_follow_ups.label }}</label>
+				{{ form.rate_inquiry_follow_ups }}
+				<div class="form-error">{{ form.rate_inquiry_follow_ups.errors.0 }}</div>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label">{{ form.bill_of_lading_follow_ups.label }}</label>
+				{{ form.bill_of_lading_follow_ups }}
+				<div class="form-error">{{ form.bill_of_lading_follow_ups.errors.0 }}</div>
+			</div>
+
+			<label class="average-toggle">
+				<span>{{ form.is_completed.label }}</span>
+				{{ form.is_completed }}
+				<span class="average-toggle-track"><span></span></span>
+			</label>
+
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">ذخیره کار</button>
+				<a href="{% url 'marketing:tomorrow_task_list' %}" class="btn btn-secondary">انصراف</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script>
+(function () {
+	function setupCustomerCombobox(wrapper) {
+		const select = wrapper.querySelector('select');
+		const control = wrapper.querySelector('.customer-multi-control');
+		const input = wrapper.querySelector('.customer-multi-input');
+		const chips = wrapper.querySelector('.customer-multi-chips');
+		const arrow = wrapper.querySelector('.customer-multi-arrow');
+		const menu = wrapper.querySelector('.customer-multi-menu');
+		const filter = wrapper.querySelector('.customer-multi-filter');
+		const list = wrapper.querySelector('.customer-multi-list');
+		const empty = wrapper.querySelector('.customer-multi-empty');
+
+		if (!select) return;
+
+		const options = Array.from(select.options);
+
+		function getSelectedOptions() {
+			return options.filter(option => option.selected && option.value !== '');
+		}
+
+		function renderChips() {
+			chips.innerHTML = '';
+
+			getSelectedOptions().forEach(option => {
+				const chip = document.createElement('span');
+				chip.className = 'customer-multi-chip';
+
+				const label = document.createElement('span');
+				label.textContent = option.textContent.trim();
+
+				const remove = document.createElement('button');
+				remove.type = 'button';
+				remove.setAttribute('aria-label', 'حذف ' + option.textContent.trim());
+				remove.textContent = '×';
+
+				remove.addEventListener('mousedown', function (event) {
+					event.preventDefault();
+					option.selected = false;
+					select.dispatchEvent(new Event('change', { bubbles: true }));
+					renderChips();
+					renderOptions(filter.value);
+				});
+
+				chip.appendChild(label);
+				chip.appendChild(remove);
+				chips.appendChild(chip);
+			});
+		}
+
+		function renderOptions(query) {
+			const normalized = (query || '').trim().toLocaleLowerCase();
+			list.innerHTML = '';
+
+			const matches = options.filter(option => {
+				return option.value !== '' &&
+					option.textContent.trim().toLocaleLowerCase().includes(normalized);
+			});
+
+			empty.hidden = matches.length !== 0;
+
+			matches.forEach(option => {
+				const item = document.createElement('div');
+				item.className = 'customer-multi-option';
+				item.setAttribute('role', 'option');
+				item.setAttribute('aria-selected', option.selected ? 'true' : 'false');
+
+				const checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.tabIndex = -1;
+				checkbox.checked = option.selected;
+
+				const label = document.createElement('span');
+				label.textContent = option.textContent.trim();
+
+				item.appendChild(checkbox);
+				item.appendChild(label);
+
+				item.addEventListener('mousedown', function (event) {
+					event.preventDefault();
+					option.selected = !option.selected;
+					select.dispatchEvent(new Event('change', { bubbles: true }));
+					renderChips();
+					renderOptions(filter.value);
+				});
+
+				list.appendChild(item);
+			});
+		}
+
+		function openMenu() {
+			menu.hidden = false;
+			control.setAttribute('aria-expanded', 'true');
+			renderOptions(filter.value);
+		}
+
+		function closeMenu() {
+			menu.hidden = true;
+			control.setAttribute('aria-expanded', 'false');
+		}
+
+		input.addEventListener('focus', function () {
+			openMenu();
+		});
+
+		input.addEventListener('input', function () {
+			openMenu();
+			filter.value = input.value;
+			renderOptions(input.value);
+		});
+
+		filter.addEventListener('input', function () {
+			input.value = filter.value;
+			renderOptions(filter.value);
+		});
+
+		arrow.addEventListener('mousedown', function (event) {
+			event.preventDefault();
+			if (menu.hidden) {
+				openMenu();
+				filter.focus();
+			} else {
+				closeMenu();
+			}
+		});
+
+		control.addEventListener('mousedown', function (event) {
+			if (event.target.closest('.customer-multi-chip button')) return;
+			if (event.target !== arrow) {
+				input.focus();
+			}
+		});
+
+		document.addEventListener('mousedown', function (event) {
+			if (!wrapper.contains(event.target)) {
+				closeMenu();
+			}
+		});
+
+		filter.addEventListener('keydown', function (event) {
+			if (event.key === 'Escape') {
+				closeMenu();
+				input.focus();
+			}
+
+			if (event.key === 'Enter') {
+				const first = list.querySelector('.customer-multi-option');
+				if (first) {
+					event.preventDefault();
+					first.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+				}
+			}
+		});
+
+		select.addEventListener('change', renderChips);
+
+		renderChips();
+	}
+
+	document.querySelectorAll('.customer-multi-combobox').forEach(setupCustomerCombobox);
+
+	// Preserve the existing ?customer_id=... behavior.
+	const taskCustomerId = new URLSearchParams(window.location.search).get('customer_id');
+
+	if (taskCustomerId) {
+		document.querySelectorAll(
+			'#id_new_customer_follow_ups, #id_existing_customer_follow_ups'
+		).forEach(select => {
+			Array.from(select.options).forEach(option => {
+				if (option.value === taskCustomerId) {
+					option.selected = true;
+				}
+			});
+			select.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+	}
+})();
+</script>
 {% endblock %}

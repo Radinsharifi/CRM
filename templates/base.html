@@ -150,6 +150,159 @@
             }
         }
 
+        function filterCustomerOptions(searchInput) {
+            const target = document.getElementById(searchInput.dataset.searchTarget);
+            if (!target) return;
+            const query = searchInput.value.trim().toLocaleLowerCase();
+            Array.from(target.options).forEach(function (option) {
+                option.hidden = Boolean(query) && !option.textContent.toLocaleLowerCase().includes(query);
+            });
+        }
+
+        function setupCustomerDropdown(select) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'customer-dropdown';
+            wrapper.innerHTML = '<div class="customer-dropdown-control"><input type="search" class="customer-dropdown-input" placeholder="جستجوی مشتری..." autocomplete="off"><button type="button" class="customer-dropdown-arrow" aria-label="نمایش مشتری‌ها">⌄</button></div><div class="customer-dropdown-menu"><div class="customer-dropdown-options"></div><div class="customer-dropdown-empty" hidden>مشتری پیدا نشد.</div></div>';
+            select.parentNode.insertBefore(wrapper, select);
+            wrapper.appendChild(select);
+            select.classList.add('customer-dropdown-native');
+            const input = wrapper.querySelector('.customer-dropdown-input');
+            const arrow = wrapper.querySelector('.customer-dropdown-arrow');
+            const options = wrapper.querySelector('.customer-dropdown-options');
+            const empty = wrapper.querySelector('.customer-dropdown-empty');
+            const multiple = select.multiple;
+
+            function selectedText() {
+                return Array.from(select.selectedOptions).map(option => option.textContent.trim()).join('، ');
+            }
+
+            function renderOptions(query = '') {
+                const normalizedQuery = query.trim().toLocaleLowerCase();
+                options.innerHTML = '';
+                const matches = Array.from(select.options).filter(option => option.value && option.textContent.trim().toLocaleLowerCase().includes(normalizedQuery));
+                empty.hidden = matches.length !== 0;
+                matches.forEach(option => {
+                    const item = document.createElement('label');
+                    item.className = 'customer-dropdown-option';
+                    item.innerHTML = '<input type="' + (multiple ? 'checkbox' : 'radio') + '" name="customer-picker-' + select.id + '" ' + (option.selected ? 'checked' : '') + '><span>' + option.textContent + '</span>';
+                    item.querySelector('input').addEventListener('change', function () {
+                        if (!multiple) Array.from(select.options).forEach(current => { current.selected = current === option; });
+                        option.selected = this.checked;
+                        updateTrigger();
+                        if (!multiple) closeDropdown();
+                    });
+                    options.appendChild(item);
+                });
+            }
+
+            function updateTrigger() {
+                if (!multiple) input.value = selectedText();
+            }
+
+            function openDropdown() {
+                wrapper.classList.add('open');
+                renderOptions(multiple ? input.value : '');
+            }
+
+            function closeDropdown() {
+                wrapper.classList.remove('open');
+                updateTrigger();
+            }
+
+            input.addEventListener('focus', openDropdown);
+            input.addEventListener('input', function () { openDropdown(); renderOptions(input.value); });
+            arrow.addEventListener('mousedown', function (event) { event.preventDefault(); if (wrapper.classList.contains('open')) closeDropdown(); else { openDropdown(); input.focus(); } });
+            input.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') closeDropdown();
+                if (event.key === 'Enter') {
+                    const firstMatch = options.querySelector('.customer-dropdown-option');
+                    if (firstMatch && !multiple) { event.preventDefault(); firstMatch.querySelector('input').click(); }
+                }
+            });
+            select.addEventListener('change', updateTrigger);
+            document.addEventListener('click', function (event) { if (!wrapper.contains(event.target)) closeDropdown(); });
+            updateTrigger();
+        }
+
+        document.querySelectorAll('.customer-searchable-select').forEach(setupCustomerDropdown);
+
+        function setupCustomerCombobox(combobox) {
+            const select = combobox.querySelector('select');
+            const control = combobox.querySelector('.customer-combobox-control');
+            const input = combobox.querySelector('.customer-combobox-input');
+            const filter = combobox.querySelector('.customer-combobox-search input');
+            const menu = combobox.querySelector('.customer-combobox-menu');
+            const list = combobox.querySelector('.customer-combobox-list');
+            const empty = combobox.querySelector('.customer-combobox-empty');
+            const arrow = combobox.querySelector('.customer-combobox-arrow');
+            const multiple = select.multiple;
+            const customerOptions = Array.from(select.options).filter(option => option.value !== '');
+
+            function selectedCustomerText() {
+                return Array.from(select.selectedOptions).map(option => option.textContent.trim()).join('، ');
+            }
+
+            function updateInput() {
+                input.value = multiple ? '' : selectedCustomerText();
+            }
+
+            function renderOptions(query) {
+                const normalizedQuery = query.trim().toLocaleLowerCase();
+                list.innerHTML = '';
+                const matches = customerOptions.filter(option => option.textContent.trim().toLocaleLowerCase().includes(normalizedQuery));
+                empty.hidden = matches.length !== 0;
+                matches.forEach(option => {
+                    const item = document.createElement('label');
+                    item.className = 'customer-combobox-option';
+                    if (option.value === select.value || (multiple && option.selected)) item.classList.add('is-selected');
+                    item.setAttribute('role', 'option');
+                    item.innerHTML = '<input type="' + (multiple ? 'checkbox' : 'radio') + '" name="customer-picker-' + select.id + '" ' + (option.selected ? 'checked' : '') + '><span>' + option.textContent.trim() + '</span>';
+                    item.querySelector('input').addEventListener('change', function () {
+                        if (!multiple) Array.from(select.options).forEach(current => { current.selected = current === option; });
+                        option.selected = this.checked;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        updateInput();
+                        if (!multiple) closeDropdown();
+                    });
+                    list.appendChild(item);
+                });
+            }
+
+            function openDropdown() {
+                menu.hidden = false;
+                control.setAttribute('aria-expanded', 'true');
+                renderOptions(multiple ? filter.value : '');
+            }
+
+            function closeDropdown() {
+                menu.hidden = true;
+                control.setAttribute('aria-expanded', 'false');
+                updateInput();
+            }
+
+            input.addEventListener('focus', openDropdown);
+            input.addEventListener('input', function () { openDropdown(); filter.value = input.value; renderOptions(input.value); });
+            filter.addEventListener('input', function () { renderOptions(filter.value); });
+            arrow.addEventListener('mousedown', function (event) { event.preventDefault(); if (menu.hidden) { openDropdown(); input.focus(); } else closeDropdown(); });
+            filter.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') { closeDropdown(); input.focus(); }
+                if (event.key === 'Enter') {
+                    const firstMatch = list.querySelector('.customer-combobox-option');
+                    if (firstMatch && !multiple) { event.preventDefault(); firstMatch.querySelector('input').click(); }
+                }
+            });
+            input.addEventListener('keydown', function (event) { if (event.key === 'Escape') closeDropdown(); });
+            select.addEventListener('change', updateInput);
+            document.addEventListener('mousedown', function (event) { if (!combobox.contains(event.target)) closeDropdown(); });
+            updateInput();
+        }
+
+        document.querySelectorAll('[data-customer-combobox]').forEach(setupCustomerCombobox);
+
+        document.querySelectorAll('.customer-search-input').forEach(function (searchInput) {
+            searchInput.addEventListener('input', function () { filterCustomerOptions(searchInput); });
+        });
+
         // Close if clicking the dark background
         window.addEventListener('click', function(event) {
             const modal = document.getElementById('customerModal');

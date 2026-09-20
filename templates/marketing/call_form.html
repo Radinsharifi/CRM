@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- Centered container to ensure it stays away from sidebar edges -->
 <div style="max-width: 700px; margin: 0 auto; width: 100%;">
     <div class="page-header" style="margin-bottom: 24px;">
         <h1 class="page-title">{% if object %}ویرایش رکورد تماس{% else %}ثبت رکورد جدید{% endif %}</h1>
@@ -29,14 +28,35 @@
                         + افزودن سریع مشتری
                     </button>
                 </label>
-                <select name="customer" class="form-select" required id="id_customer">
-                    <option value="" disabled selected>-- انتخاب از لیست --</option>
-                    {% for val, label in form.fields.customer.choices %}
-                        {% if val %}
-                            <option value="{{ val }}" {% if form.customer.value|stringformat:"s" == val|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
+
+             
+                <div class="customer-combobox" id="customerCombobox">
+                    {{ form.customer }}
+                    <div class="customer-combobox-control" role="combobox"
+                         aria-haspopup="listbox" aria-expanded="false"
+                         aria-controls="customerOptions">
+                        <input
+                            type="text"
+                            id="customerSearch"
+                            class="form-input customer-combobox-input"
+                            autocomplete="off"
+                            placeholder="جستجوی مشتری..."
+                            aria-autocomplete="list"
+                            aria-controls="customerOptions"
+                        >
+                        <button type="button" class="customer-combobox-arrow" aria-label="نمایش مشتری‌ها">⌄</button>
+                    </div>
+
+                    <div class="customer-combobox-menu" id="customerOptions" role="listbox" hidden>
+                        <div class="customer-combobox-search">
+                            <input type="text" id="customerFilter" autocomplete="off"
+                                   placeholder="جستجو...">
+                        </div>
+                        <div class="customer-combobox-list"></div>
+                        <div class="customer-combobox-empty" hidden>مشتری پیدا نشد.</div>
+                    </div>
+                </div>
+
                 <div class="form-error">{{ form.customer.errors.0 }}</div>
             </div>
 
@@ -80,8 +100,233 @@
         </form>
     </div>
 </div>
+<style>
+    /* Searchable customer combobox */
+    .customer-combobox {
+        position: relative;
+        width: 100%;
+    }
+
+    .customer-combobox > select {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .customer-combobox-control {
+        position: relative;
+    }
+
+    .customer-combobox-input {
+        width: 100%;
+        padding-left: 42px !important;
+        cursor: text;
+    }
+
+    .customer-combobox-arrow {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        border: 0;
+        background: transparent;
+        color: #777;
+        cursor: pointer;
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    .customer-combobox-menu {
+        position: absolute;
+        z-index: 1000;
+        top: calc(100% + 4px);
+        right: 0;
+        left: 0;
+        background: #fff;
+        border: 1px solid #bbb;
+        border-radius: 7px;
+        box-shadow: 0 8px 22px rgba(0,0,0,.12);
+        overflow: hidden;
+    }
+
+    .customer-combobox-search {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+        background: #fff;
+    }
+
+    .customer-combobox-search input {
+        box-sizing: border-box;
+        width: 100%;
+        height: 42px;
+        padding: 8px 12px;
+        border: 1px solid #bbb;
+        border-radius: 6px;
+        outline: none;
+        font: inherit;
+    }
+
+    .customer-combobox-search input:focus {
+        border-color: hsl(var(--primary));
+    }
+
+    .customer-combobox-list {
+        max-height: 280px;
+        overflow-y: auto;
+    }
+
+    .customer-combobox-option {
+        padding: 12px 14px;
+        cursor: pointer;
+        font-size: 15px;
+        line-height: 1.4;
+        text-align: right;
+    }
+
+    .customer-combobox-option:hover,
+    .customer-combobox-option.is-highlighted {
+        background: #f1f1f1;
+    }
+
+    .customer-combobox-option.is-selected {
+        background: #666;
+        color: #fff;
+    }
+
+    .customer-combobox-empty {
+        padding: 14px;
+        color: #777;
+        text-align: center;
+    }
+
+    @media (max-width: 600px) {
+        .customer-combobox-list {
+            max-height: 240px;
+        }
+    }
+</style>
+
 <script>
+    const customerSelect = document.getElementById('id_customer');
+    const customerCombobox = document.getElementById('customerCombobox');
+    const customerControl = customerCombobox.querySelector('.customer-combobox-control');
+    const customerSearch = document.getElementById('customerSearch');
+    const customerFilter = document.getElementById('customerFilter');
+    const customerMenu = document.getElementById('customerOptions');
+    const customerList = customerCombobox.querySelector('.customer-combobox-list');
+    const customerEmpty = customerCombobox.querySelector('.customer-combobox-empty');
+    const customerArrow = customerCombobox.querySelector('.customer-combobox-arrow');
+
+    const customerOptions = Array.from(customerSelect.options).filter(option => option.value !== '');
+
+    function selectedCustomerText() {
+        const option = customerSelect.options[customerSelect.selectedIndex];
+        return option && option.value ? option.textContent.trim() : '';
+    }
+
+    function openCustomerDropdown() {
+        customerMenu.hidden = false;
+        customerControl.setAttribute('aria-expanded', 'true');
+        customerFilter.value = '';
+        renderCustomerOptions('');
+        requestAnimationFrame(() => customerFilter.focus());
+    }
+
+    function closeCustomerDropdown() {
+        customerMenu.hidden = true;
+        customerControl.setAttribute('aria-expanded', 'false');
+    }
+
+    function renderCustomerOptions(query) {
+        const normalizedQuery = query.trim().toLocaleLowerCase();
+        customerList.innerHTML = '';
+
+        const matches = customerOptions.filter(option =>
+            option.textContent.trim().toLocaleLowerCase().includes(normalizedQuery)
+        );
+
+        customerEmpty.hidden = matches.length !== 0;
+
+        matches.forEach(option => {
+            const item = document.createElement('div');
+            item.className = 'customer-combobox-option';
+            item.setAttribute('role', 'option');
+            item.dataset.value = option.value;
+            item.textContent = option.textContent.trim();
+
+            if (option.value === customerSelect.value) {
+                item.classList.add('is-selected');
+                item.setAttribute('aria-selected', 'true');
+            }
+
+            item.addEventListener('mousedown', event => {
+                event.preventDefault();
+                selectCustomer(option.value);
+            });
+
+            customerList.appendChild(item);
+        });
+    }
+
+    function selectCustomer(value) {
+        customerSelect.value = value;
+        customerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        customerSearch.value = selectedCustomerText();
+        closeCustomerDropdown();
+    }
+
+    customerSearch.addEventListener('focus', openCustomerDropdown);
+
+    customerSearch.addEventListener('input', () => {
+        customerMenu.hidden = false;
+        customerControl.setAttribute('aria-expanded', 'true');
+        customerFilter.value = customerSearch.value;
+        renderCustomerOptions(customerSearch.value);
+    });
+
+    customerFilter.addEventListener('input', () => {
+        renderCustomerOptions(customerFilter.value);
+    });
+
+    customerArrow.addEventListener('mousedown', event => {
+        event.preventDefault();
+        if (customerMenu.hidden) {
+            openCustomerDropdown();
+        } else {
+            closeCustomerDropdown();
+        }
+    });
+
+    document.addEventListener('mousedown', event => {
+        if (!customerCombobox.contains(event.target)) {
+            closeCustomerDropdown();
+        }
+    });
+
+    customerFilter.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            closeCustomerDropdown();
+            customerSearch.focus();
+        }
+
+        if (event.key === 'Enter') {
+            const firstMatch = customerList.querySelector('.customer-combobox-option');
+            if (firstMatch) {
+                event.preventDefault();
+                selectCustomer(firstMatch.dataset.value);
+            }
+        }
+    });
+
+    customerSearch.value = selectedCustomerText();
+
     const callCustomerId = new URLSearchParams(window.location.search).get('customer_id');
-    if (callCustomerId) document.getElementById('id_customer').value = callCustomerId;
+    if (callCustomerId) {
+        selectCustomer(callCustomerId);
+    }
 </script>
 {% endblock %}

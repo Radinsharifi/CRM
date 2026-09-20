@@ -1,1 +1,20 @@
-{% extends 'base.html' %}{% block content %}<div class="card" style="max-width:600px;margin:40px auto;text-align:center;"><h1 class="page-title" style="font-size:20px;margin-bottom:12px;">حذف کار فردا</h1><p style="margin-bottom:24px;">آیا از حذف این کار مطمئن هستید؟</p><form method="post">{% csrf_token %}<button class="btn" style="background:hsl(var(--destructive));color:#fff;" type="submit">حذف</button><a class="btn btn-secondary" href="{% url 'marketing:tomorrow_task_detail' object.pk %}">انصراف</a></form></div>{% endblock %}
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card" style="max-width:600px;margin:40px auto;text-align:center;">
+	<h1 class="page-title" style="font-size:20px;margin-bottom:12px;">
+		حذف کار فردا
+	</h1>
+	<p style="margin-bottom:24px;">آیا از حذف این کار مطمئن هستید؟</p>
+
+	<form method="post">
+		{% csrf_token %}
+		<button class="btn" style="background:hsl(var(--destructive));color:#fff;" type="submit">
+			حذف
+		</button>
+		<a class="btn btn-secondary" href="{% url 'marketing:tomorrow_task_detail' object.pk %}">
+			انصراف
+		</a>
+	</form>
+</div>
+{% endblock %}

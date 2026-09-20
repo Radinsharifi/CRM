@@ -53,9 +53,9 @@
     <div class="grid grid-4" style="margin-bottom:24px">
 
         <!-- یادآوری‌ها -->
-        <div class="card stat-card">
+        <div class="card stat-card" onclick="location.href='{% url 'marketing:reminder_list' %}'">
             <div>
-                <div class="stat-title">یادآوری‌های تماس</div>
+                <div class="stat-title" >یادآوری‌های تماس</div>
                 <div class="stat-value">{{ reminders_count }}</div>
                 <div class="stat-change up">↑ <span class="label">کل یادآوری‌ها</span></div>
             </div>
@@ -65,9 +65,9 @@
         </div>
 
         <!-- کارهای فردا -->
-        <div class="card stat-card">
+        <div class="card stat-card" onclick="location.href='{% url 'marketing:tomorrow_task_list' %}'">
             <div>
-                <div class="stat-title">کارهای باز فردا</div>
+                <div class="stat-title" >کارهای باز فردا</div>
                 <div class="stat-value">{{ open_tomorrow_tasks_count }}</div>
                 <div class="stat-change up">↑ <span class="label">در انتظار انجام</span></div>
             </div>
@@ -77,9 +77,9 @@
         </div>
 
         <!-- تماس‌های امروز -->
-        <div class="card stat-card">
+        <div class="card stat-card" onclick="location.href='{% url 'marketing:call_list' %}'">
             <div>
-                <div class="stat-title">تماس‌های امروز</div>
+                <div class="stat-title" >تماس‌های امروز</div>
                 <div class="stat-value">{{ calls_today_count }}</div>
                 <div class="stat-change up">↑ <span class="label">بروزرسانی لحظه‌ای</span></div>
             </div>

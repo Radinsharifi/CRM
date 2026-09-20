@@ -1,10 +1,409 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div style="max-width:700px;margin:0 auto;"><div class="page-header"><h1 class="page-title">{% if object %}ویرایش یادآوری{% else %}ثبت یادآوری تماس{% endif %}</h1></div><div class="card"><form method="post">{% csrf_token %}{% if form.errors %}<div class="form-error" style="margin-bottom:16px;">لطفا خطاهای فرم را اصلاح کنید.</div>{% endif %}
-<div class="form-group"><label class="form-label" style="display:flex;justify-content:space-between;align-items:center;"><span>{{ form.customer.label }} *</span><button type="button" onclick="openCustomerModal()" style="background:none;border:0;color:hsl(var(--primary));font-size:11px;font-weight:700;cursor:pointer;">+ افزودن سریع مشتری</button></label>{{ form.customer }}<div class="form-error">{{ form.customer.errors.0 }}</div></div>
-<div class="form-group"><label class="form-label">{{ form.subject.label }} *</label>{{ form.subject }}<div class="form-error">{{ form.subject.errors.0 }}</div></div>
-<div class="grid grid-2"><div class="form-group"><label class="form-label">{{ form.follow_up_date.label }} *</label>{{ form.follow_up_date }}<div class="form-error">{{ form.follow_up_date.errors.0 }}</div></div><div class="form-group"><label class="form-label">{{ form.follow_up_time.label }} *</label>{{ form.follow_up_time }}<div class="form-error">{{ form.follow_up_time.errors.0 }}</div></div></div>
-<div class="form-group"><label class="form-label">{{ form.priority.label }}</label>{{ form.priority }}<div class="form-error">{{ form.priority.errors.0 }}</div></div>
-<div class="form-actions"><button type="submit" class="btn btn-primary">ذخیره یادآوری</button><a href="{% url 'marketing:reminder_list' %}" class="btn btn-secondary">انصراف</a></div></form></div></div>
-<script>const reminderCustomerId = new URLSearchParams(window.location.search).get('customer_id'); if (reminderCustomerId) document.getElementById('id_customer').value = reminderCustomerId;</script>
+<div class="reminder-form-page">
+	<div class="page-header">
+		<h1 class="page-title">
+			{% if object %}ویرایش یادآوری{% else %}ثبت یادآوری تماس{% endif %}
+		</h1>
+	</div>
+
+	<div class="card">
+		<form method="post">
+			{% csrf_token %}
+
+			{% if form.errors %}
+			<div class="form-error reminder-form-error">
+				لطفا خطاهای فرم را اصلاح کنید.
+			</div>
+			{% endif %}
+
+			<div class="form-group">
+				<label class="form-label reminder-customer-label">
+					<span>{{ form.customer.label }} *</span>
+					<button type="button" onclick="openCustomerModal()">
+						+ افزودن سریع مشتری
+					</button>
+				</label>
+
+				<div class="reminder-customer-combobox" id="reminderCustomerCombobox">
+					{{ form.customer }}
+
+					<div
+						class="reminder-customer-control"
+						role="combobox"
+						aria-haspopup="listbox"
+						aria-expanded="false"
+						aria-controls="reminderCustomerOptions"
+					>
+						<input
+							type="text"
+							id="reminderCustomerSearch"
+							class="form-input reminder-customer-input"
+							autocomplete="off"
+							placeholder="جستجوی مشتری..."
+							aria-autocomplete="list"
+							aria-controls="reminderCustomerOptions"
+						>
+						<button
+							type="button"
+							class="reminder-customer-arrow"
+							aria-label="نمایش مشتری‌ها"
+						>⌄</button>
+					</div>
+
+					<div
+						class="reminder-customer-menu"
+						id="reminderCustomerOptions"
+						role="listbox"
+						hidden
+					>
+						<div class="reminder-customer-search">
+							<input
+								type="text"
+								id="reminderCustomerFilter"
+								autocomplete="off"
+								placeholder="جستجو..."
+							>
+						</div>
+						<div class="reminder-customer-list"></div>
+						<div class="reminder-customer-empty" hidden>
+							مشتری پیدا نشد.
+						</div>
+					</div>
+				</div>
+
+				<div class="form-error">{{ form.customer.errors.0 }}</div>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label" for="id_subject">
+					{{ form.subject.label }} *
+				</label>
+				{{ form.subject }}
+				<div class="form-error">{{ form.subject.errors.0 }}</div>
+			</div>
+
+			<div class="grid grid-2">
+				<div class="form-group">
+					<label class="form-label" for="id_follow_up_date">
+						{{ form.follow_up_date.label }} *
+					</label>
+					{{ form.follow_up_date }}
+					<div class="form-error">
+						{{ form.follow_up_date.errors.0 }}
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label class="form-label" for="id_follow_up_time">
+						{{ form.follow_up_time.label }} *
+					</label>
+					{{ form.follow_up_time }}
+					<div class="form-error">
+						{{ form.follow_up_time.errors.0 }}
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="form-label" for="id_priority">
+					{{ form.priority.label }}
+				</label>
+				{{ form.priority }}
+				<div class="form-error">{{ form.priority.errors.0 }}</div>
+			</div>
+
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary">
+					ذخیره یادآوری
+				</button>
+				<a href="{% url 'marketing:reminder_list' %}" class="btn btn-secondary">
+					انصراف
+				</a>
+			</div>
+		</form>
+	</div>
+</div>
+
+<style>
+	.reminder-form-page {
+		max-width: 700px;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.reminder-form-error {
+		margin-bottom: 24px;
+	}
+
+	.reminder-customer-label {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.reminder-customer-label button {
+		border: 0;
+		background: none;
+		color: hsl(var(--primary));
+		font-size: 11px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.reminder-customer-combobox {
+		position: relative;
+		width: 100%;
+	}
+
+	.reminder-customer-combobox > select {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.reminder-customer-control {
+		position: relative;
+	}
+
+	.reminder-customer-input {
+		width: 100%;
+		padding-left: 42px !important;
+		cursor: text;
+	}
+
+	.reminder-customer-arrow {
+		position: absolute;
+		left: 8px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 32px;
+		height: 32px;
+		border: 0;
+		background: transparent;
+		color: #777;
+		cursor: pointer;
+		font-size: 20px;
+		line-height: 1;
+	}
+
+	.reminder-customer-menu {
+		position: absolute;
+		z-index: 1000;
+		top: calc(100% + 4px);
+		right: 0;
+		left: 0;
+		background: #fff;
+		border: 1px solid #bbb;
+		border-radius: 7px;
+		box-shadow: 0 8px 22px rgba(0, 0, 0, .12);
+		overflow: hidden;
+	}
+
+	.reminder-customer-search {
+		padding: 8px;
+		border-bottom: 1px solid #ddd;
+		background: #fff;
+	}
+
+	.reminder-customer-search input {
+		box-sizing: border-box;
+		width: 100%;
+		height: 42px;
+		padding: 8px 12px;
+		border: 1px solid #bbb;
+		border-radius: 6px;
+		outline: none;
+		font: inherit;
+	}
+
+	.reminder-customer-search input:focus {
+		border-color: hsl(var(--primary));
+	}
+
+	.reminder-customer-list {
+		max-height: 280px;
+		overflow-y: auto;
+	}
+
+	.reminder-customer-option {
+		padding: 12px 14px;
+		cursor: pointer;
+		font-size: 15px;
+		line-height: 1.4;
+		text-align: right;
+	}
+
+	.reminder-customer-option:hover,
+	.reminder-customer-option.is-highlighted {
+		background: #f1f1f1;
+	}
+
+	.reminder-customer-option.is-selected {
+		background: #666;
+		color: #fff;
+	}
+
+	.reminder-customer-empty {
+		padding: 14px;
+		color: #777;
+		text-align: center;
+	}
+
+	@media (max-width: 600px) {
+		.reminder-customer-list {
+			max-height: 240px;
+		}
+	}
+</style>
+
+<script>
+	const reminderCustomerSelect = document.getElementById('id_customer');
+	const reminderCustomerCombobox = document.getElementById(
+		'reminderCustomerCombobox'
+	);
+	const reminderCustomerControl = reminderCustomerCombobox.querySelector(
+		'.reminder-customer-control'
+	);
+	const reminderCustomerSearch = document.getElementById(
+		'reminderCustomerSearch'
+	);
+	const reminderCustomerFilter = document.getElementById(
+		'reminderCustomerFilter'
+	);
+	const reminderCustomerMenu = document.getElementById(
+		'reminderCustomerOptions'
+	);
+	const reminderCustomerList = reminderCustomerCombobox.querySelector(
+		'.reminder-customer-list'
+	);
+	const reminderCustomerEmpty = reminderCustomerCombobox.querySelector(
+		'.reminder-customer-empty'
+	);
+	const reminderCustomerArrow = reminderCustomerCombobox.querySelector(
+		'.reminder-customer-arrow'
+	);
+
+	const reminderCustomerOptions = Array.from(
+		reminderCustomerSelect.options
+	).filter(option => option.value !== '');
+
+	function selectedReminderCustomerText() {
+		const option = reminderCustomerSelect.options[
+			reminderCustomerSelect.selectedIndex
+		];
+
+		return option && option.value ? option.textContent.trim() : '';
+	}
+
+	function openReminderCustomerDropdown() {
+		reminderCustomerMenu.hidden = false;
+		reminderCustomerControl.setAttribute('aria-expanded', 'true');
+		reminderCustomerFilter.value = '';
+		renderReminderCustomerOptions('');
+		requestAnimationFrame(() => reminderCustomerFilter.focus());
+	}
+
+	function closeReminderCustomerDropdown() {
+		reminderCustomerMenu.hidden = true;
+		reminderCustomerControl.setAttribute('aria-expanded', 'false');
+	}
+
+	function renderReminderCustomerOptions(query) {
+		const normalizedQuery = query.trim().toLocaleLowerCase();
+		reminderCustomerList.innerHTML = '';
+
+		const matches = reminderCustomerOptions.filter(option =>
+			option.textContent.trim().toLocaleLowerCase().includes(normalizedQuery)
+		);
+
+		reminderCustomerEmpty.hidden = matches.length !== 0;
+
+		matches.forEach(option => {
+			const item = document.createElement('div');
+			item.className = 'reminder-customer-option';
+			item.setAttribute('role', 'option');
+			item.dataset.value = option.value;
+			item.textContent = option.textContent.trim();
+
+			if (option.value === reminderCustomerSelect.value) {
+				item.classList.add('is-selected');
+				item.setAttribute('aria-selected', 'true');
+			}
+
+			item.addEventListener('mousedown', event => {
+				event.preventDefault();
+				selectReminderCustomer(option.value);
+			});
+
+			reminderCustomerList.appendChild(item);
+		});
+	}
+
+	function selectReminderCustomer(value) {
+		reminderCustomerSelect.value = value;
+		reminderCustomerSelect.dispatchEvent(new Event('change', { bubbles: true }));
+		reminderCustomerSearch.value = selectedReminderCustomerText();
+		closeReminderCustomerDropdown();
+	}
+
+	reminderCustomerSearch.addEventListener('focus', openReminderCustomerDropdown);
+
+	reminderCustomerSearch.addEventListener('input', () => {
+		reminderCustomerMenu.hidden = false;
+		reminderCustomerControl.setAttribute('aria-expanded', 'true');
+		reminderCustomerFilter.value = reminderCustomerSearch.value;
+		renderReminderCustomerOptions(reminderCustomerSearch.value);
+	});
+
+	reminderCustomerFilter.addEventListener('input', () => {
+		renderReminderCustomerOptions(reminderCustomerFilter.value);
+	});
+
+	reminderCustomerArrow.addEventListener('mousedown', event => {
+		event.preventDefault();
+
+		if (reminderCustomerMenu.hidden) {
+			openReminderCustomerDropdown();
+		} else {
+			closeReminderCustomerDropdown();
+		}
+	});
+
+	document.addEventListener('mousedown', event => {
+		if (!reminderCustomerCombobox.contains(event.target)) {
+			closeReminderCustomerDropdown();
+		}
+	});
+
+	reminderCustomerFilter.addEventListener('keydown', event => {
+		if (event.key === 'Escape') {
+			closeReminderCustomerDropdown();
+			reminderCustomerSearch.focus();
+		}
+
+		if (event.key === 'Enter') {
+			const firstMatch = reminderCustomerList.querySelector(
+				'.reminder-customer-option'
+			);
+
+			if (firstMatch) {
+				event.preventDefault();
+				selectReminderCustomer(firstMatch.dataset.value);
+			}
+		}
+	});
+
+	reminderCustomerSearch.value = selectedReminderCustomerText();
+
+	const reminderCustomerId = new URLSearchParams(window.location.search)
+		.get('customer_id');
+
+	if (reminderCustomerId) {
+		selectReminderCustomer(reminderCustomerId);
+	}
+</script>
 {% endblock %}
