@@ -27,6 +27,7 @@ class Customer(models.Model):
         blank=True,
         verbose_name="دسته‌بندی"
     )
+    insider = models.IntegerField(blank=True, null=True, verbose_name="داخلی")
     phone_number = models.CharField(max_length=20, blank=True, verbose_name="شماره تماس")
     province = models.CharField(max_length=100, blank=True, verbose_name="استان")
     city = models.CharField(max_length=100, blank=True, verbose_name="شهر")

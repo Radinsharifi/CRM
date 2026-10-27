@@ -131,6 +131,7 @@ class OwnershipVisibilityTests(TestCase):
 				'full_name': 'New Contact Full Name',
 				'company_name': 'New Company',
 				'phone_number': '4444444444',
+				'insider': '42',
 			},
 		)
 		self.client.post(
@@ -144,7 +145,7 @@ class OwnershipVisibilityTests(TestCase):
 
 		self.assertTrue(
 			Customer.objects.filter(
-				company_name='New Company', created_by=self.marketer
+				company_name='New Company', created_by=self.marketer, insider=42
 			).exists()
 		)
 		self.assertTrue(

@@ -91,7 +91,7 @@ class CustomerListView(LoginRequiredMixin, ListView):
     model = Customer
     template_name = 'marketing/customer_list.html'
     context_object_name = 'customers'
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         customers = visible_customers(self.request.user).order_by('-created_at')
@@ -164,7 +164,7 @@ class CallListView(LoginRequiredMixin, ListView):
     model = CallRecord
     template_name = 'marketing/call_list.html'
     context_object_name = 'calls'
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         calls = visible_calls(self.request.user)
@@ -228,7 +228,7 @@ class ReminderListView(LoginRequiredMixin, ListView):
     model = CallReminder
     template_name = 'marketing/reminder_list.html'
     context_object_name = 'reminders'
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         return visible_reminders(self.request.user).select_related('customer', 'created_by')
@@ -286,7 +286,7 @@ class TomorrowTaskListView(LoginRequiredMixin, ListView):
     model = TomorrowTask
     template_name = 'marketing/tomorrow_task_list.html'
     context_object_name = 'tasks'
-    paginate_by = 10
+    paginate_by = 20
 
     def get_queryset(self):
         return visible_tomorrow_tasks(self.request.user).prefetch_related(
